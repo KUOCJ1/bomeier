@@ -10,7 +10,10 @@ var BME_CUSTOM = {
     chainLength: '',
     accessoryType: '',
     description: '',
-    referenceImage: ''
+    referenceImage: {
+      name: '',
+      dataUrl: ''
+    }
   },
   styleCards: [
     {
@@ -153,6 +156,10 @@ var BME_CUSTOM = {
       });
     }
 
+    if (step === 5) {
+      this.setupReferenceImageInput();
+    }
+
     var nextBtn = document.getElementById('step-next-btn');
     if (nextBtn) {
       if (step < this.totalSteps) {
@@ -164,6 +171,54 @@ var BME_CUSTOM = {
       } else {
         nextBtn.style.display = 'none';
       }
+    }
+  },
+
+  setupReferenceImageInput: function() {
+    var self = this;
+    var input = document.getElementById('custom-reference-image');
+    if (input && !input._bmeBound) {
+      input._bmeBound = true;
+      input.addEventListener('change', function(event) {
+        var file = event.target.files && event.target.files[0];
+        if (!file) return;
+
+        if (!file.type || file.type.indexOf('image/') !== 0) {
+          alert('請選擇圖片檔。');
+          input.value = '';
+          return;
+        }
+
+        if (file.size > 3 * 1024 * 1024) {
+          alert('參考圖請控制在 3MB 以內。');
+          input.value = '';
+          return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function() {
+          self.selections.referenceImage = {
+            name: file.name,
+            dataUrl: reader.result
+          };
+          self.renderStep(self.currentStep);
+          self.updateProgress();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    var clearBtn = document.getElementById('reference-image-clear');
+    if (clearBtn && !clearBtn._bmeBound) {
+      clearBtn._bmeBound = true;
+      clearBtn.addEventListener('click', function() {
+        self.selections.referenceImage = {
+          name: '',
+          dataUrl: ''
+        };
+        self.renderStep(self.currentStep);
+        self.updateProgress();
+      });
     }
   },
 
@@ -290,6 +345,7 @@ var BME_CUSTOM = {
       other: '其他'
     };
     var selectedStyle = this.getStyleCard(this.selections.glassColor);
+    var referenceImage = this.selections.referenceImage || { name: '', dataUrl: '' };
 
     return '<h3>確認訂製內容</h3><p class="custom-step-desc">如果沒問題，就把需求送出。我們會依照你選的風格開始整理。</p>' +
       (selectedStyle ? '<div class="custom-summary-preview"><img src="' + selectedStyle.image + '" alt="' + selectedStyle.label + ' 代表款"><div><div class="custom-summary-preview-kicker">你選的風格</div><strong>' + selectedStyle.label + '</strong><p>代表款：' + selectedStyle.productName + '</p><p>' + selectedStyle.colorLabel + '，適合場景：' + selectedStyle.scene + '</p></div></div>' : '') +
@@ -298,6 +354,22 @@ var BME_CUSTOM = {
         '<div class="custom-summary-row"><span>金屬</span><strong>' + (metalLabels[this.selections.metalType] || '—') + '</strong></div>' +
         '<div class="custom-summary-row"><span>長度</span><strong>' + (lengthLabels[this.selections.chainLength] || '—') + '</strong></div>' +
         '<div class="custom-summary-row"><span>類型</span><strong>' + (typeLabels[this.selections.accessoryType] || '—') + '</strong></div>' +
+      '</div>' +
+      '<div class="custom-reference-upload">' +
+        '<div class="custom-reference-upload-head">' +
+          '<div>' +
+            '<label class="form-label" for="custom-reference-image">參考圖／上傳範例</label>' +
+            '<p class="custom-helper-text">先選風格，再補一張你喜歡的圖片或現有範例，我們會更快抓到方向。限 3MB 內的圖片檔。</p>' +
+          '</div>' +
+          '<label class="btn btn-secondary custom-upload-btn" for="custom-reference-image">選擇圖片</label>' +
+        '</div>' +
+        '<input id="custom-reference-image" type="file" accept="image/*" class="custom-file-input" />' +
+        '<div class="custom-reference-preview' + (referenceImage.dataUrl ? ' has-image' : '') + '" id="reference-image-preview">' +
+          (referenceImage.dataUrl
+            ? '<img src="' + referenceImage.dataUrl + '" alt="參考圖預覽"><div class="custom-reference-preview-copy"><strong>' + referenceImage.name + '</strong><p>這張圖會跟你的需求一起記錄。</p></div><button type="button" class="custom-reference-clear" id="reference-image-clear">移除</button>'
+            : '<div class="custom-reference-empty">目前還沒有上傳參考圖。你可以放風格照、手機殼照，或一張你喜歡的配色範例。</div>'
+          ) +
+        '</div>' +
       '</div>' +
       '<div class="form-group" style="margin-top:24px;">' +
         '<label class="form-label">補充描述</label>' +
@@ -336,7 +408,8 @@ var BME_CUSTOM = {
             metal_type: self.selections.metalType,
             chain_length: self.selections.chainLength,
             accessory_type: self.selections.accessoryType,
-            description: self.selections.description || ''
+            description: self.selections.description || '',
+            reference_image_url: (self.selections.referenceImage && self.selections.referenceImage.dataUrl) ? self.selections.referenceImage.dataUrl : ''
           });
         }).then(function() {
           document.getElementById('step-content').innerHTML =
