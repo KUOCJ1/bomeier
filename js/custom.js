@@ -1,4 +1,4 @@
-// Bo Mei Er — 半訂製菜單 (Custom Order Module)
+// Bo Mei Er 客製訂製流程
 // 依賴：auth.js, supabase-config.js
 
 var BME_CUSTOM = {
@@ -12,6 +12,48 @@ var BME_CUSTOM = {
     description: '',
     referenceImage: ''
   },
+  styleCards: [
+    {
+      value: 'romantic_rose',
+      label: '浪漫復古',
+      desc: '玫瑰金、粉嫩色系，適合送禮、約會與溫柔穿搭。',
+      note: '柔和暖調',
+      image: 'images/custom-style/style-romantic-rose.jpg',
+      accent: '#D4A574'
+    },
+    {
+      value: 'clear_pastel',
+      label: '清透日常',
+      desc: '透明琉璃、淺色系，乾淨百搭，最不挑手機殼。',
+      note: '極簡通勤',
+      image: 'images/custom-style/style-clear-pastel.jpg',
+      accent: '#A8D8EA'
+    },
+    {
+      value: 'porcelain_blue',
+      label: '霧藍瓷感',
+      desc: '藍灰色調、安靜內斂，適合喜歡冷感質地的人。',
+      note: '靜謐質感',
+      image: 'images/custom-style/style-porcelain-blue.jpg',
+      accent: '#8FB8C9'
+    },
+    {
+      value: 'sage_natural',
+      label: '自然清新',
+      desc: '大地色與植物感，放鬆、耐看、日常使用很舒服。',
+      note: '自然系',
+      image: 'images/custom-style/style-sage-natural.jpg',
+      accent: '#7BAE7F'
+    },
+    {
+      value: 'midnight_luxury',
+      label: '午夜精品',
+      desc: '深色背景、金屬光澤，低調但有份量，夜色感明顯。',
+      note: '高級夜色',
+      image: 'images/custom-style/style-midnight-luxury.jpg',
+      accent: '#0A1628'
+    }
+  ],
 
   init: function() {
     this.renderStep(this.currentStep);
@@ -21,13 +63,16 @@ var BME_CUSTOM = {
 
   setupNavigation: function() {
     var self = this;
-    document.getElementById('custom-prev-btn').addEventListener('click', function() {
-      if (self.currentStep > 1) {
-        self.currentStep--;
-        self.renderStep(self.currentStep);
-        self.updateProgress();
-      }
-    });
+    var prevBtn = document.getElementById('custom-prev-btn');
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function() {
+        if (self.currentStep > 1) {
+          self.currentStep--;
+          self.renderStep(self.currentStep);
+          self.updateProgress();
+        }
+      });
+    }
   },
 
   updateProgress: function() {
@@ -51,7 +96,7 @@ var BME_CUSTOM = {
   nextStep: function() {
     var currentGroup = this.getCurrentGroup();
     if (currentGroup && !this.selections[currentGroup]) {
-      alert('請先選擇一個選項再繼續');
+      alert('請先選一個選項再往下。');
       return;
     }
     if (this.currentStep < this.totalSteps) {
@@ -67,9 +112,17 @@ var BME_CUSTOM = {
     return map[this.currentStep] || null;
   },
 
+  getStyleCard: function(value) {
+    for (var i = 0; i < this.styleCards.length; i++) {
+      if (this.styleCards[i].value === value) return this.styleCards[i];
+    }
+    return null;
+  },
+
   renderStep: function(step) {
     var container = document.getElementById('step-content');
     if (!container) return;
+
     var html = '';
     switch (step) {
       case 1: html = this.renderStep1(); break;
@@ -78,8 +131,9 @@ var BME_CUSTOM = {
       case 4: html = this.renderStep4(); break;
       case 5: html = this.renderStep5(); break;
     }
+
     container.innerHTML = html;
-    // Event delegation - handle option clicks at container level
+
     if (!container._delegationSet) {
       container._delegationSet = true;
       container.addEventListener('click', function(e) {
@@ -88,12 +142,15 @@ var BME_CUSTOM = {
         BME_CUSTOM.selectOption(opt.dataset.group, opt.dataset.value);
       });
     }
+
     var nextBtn = document.getElementById('step-next-btn');
     if (nextBtn) {
       if (step < this.totalSteps) {
         nextBtn.style.display = 'inline-flex';
-        nextBtn.textContent = step === 4 ? '確認送出' : '下一步';
-        nextBtn.onclick = step === 4 ? function() { BME_CUSTOM.submitOrder(); } : function() { BME_CUSTOM.nextStep(); };
+        nextBtn.textContent = step === 4 ? '送出訂製' : '下一步 →';
+        nextBtn.onclick = step === 4
+          ? function() { BME_CUSTOM.submitOrder(); }
+          : function() { BME_CUSTOM.nextStep(); };
       } else {
         nextBtn.style.display = 'none';
       }
@@ -101,105 +158,125 @@ var BME_CUSTOM = {
   },
 
   renderStep1: function() {
-    var self = this;
-    var options = [
-      { value: 'romantic_rose', label: '浪漫復古', desc: '玫瑰金、粉嫩色系，優雅溫柔', color: '#D4A574', emoji: '🌸' },
-      { value: 'clear_pastel', label: '清透日常', desc: '透明琉璃、淺色系，清爽百搭', color: '#A8D8EA', emoji: '✨' },
-      { value: 'porcelain_blue', label: '霧藍瓷感', desc: '霧面質感、藍灰色調，沉穩內斂', color: '#8FB8C9', emoji: '🍃' },
-      { value: 'sage_natural', label: '自然清新', desc: '墨綠、大地色系，質樸自然', color: '#7BAE7F', emoji: '🌿' },
-      { value: 'midnight_luxury', label: '午夜精品', desc: '深色系、金屬光澤，奢華低調', color: '#0A1628', emoji: '🌙' }
-    ];
     var selected = this.selections.glassColor;
-    return '<h3>選擇琉璃色系</h3><p class="custom-step-desc">挑選你喜歡的風格，決定整體色調</p><div class="custom-options-grid">' +
+    return '<div class="custom-step-intro">' +
+      '<h3>先看風格，再選細節</h3>' +
+      '<p class="custom-step-desc">同一個手機配件，換不同場景就會長出不同氣質。先看圖，會比只看文字更快分辨差異。</p>' +
+      '</div>' +
+      '<div class="custom-style-grid">' +
+      this.styleCards.map(function(card) {
+        return '<button type="button" class="custom-option custom-style-option' + (selected === card.value ? ' selected' : '') + '" data-group="glassColor" data-value="' + card.value + '" style="--accent:' + card.accent + ';">' +
+          '<div class="custom-option-image">' +
+            '<img src="' + card.image + '" alt="' + card.label + ' 情境圖">' +
+            '<span class="custom-style-note">' + card.note + '</span>' +
+          '</div>' +
+          '<div class="custom-option-copy">' +
+            '<div class="custom-option-kicker">Style Preview</div>' +
+            '<div class="custom-option-label">' + card.label + '</div>' +
+            '<div class="custom-option-desc">' + card.desc + '</div>' +
+          '</div>' +
+          '<span class="selected-check">&#10003;</span>' +
+        '</button>';
+      }).join('') + '</div>';
+  },
+
+  renderStep2: function() {
+    var options = [
+      { value: 'rose_gold', label: '玫瑰金', desc: '帶一點粉感，最能接住浪漫與溫柔風格。', emoji: '🌷' },
+      { value: 'warm_gold', label: '暖金', desc: '更亮一些，會把琉璃的顏色往暖調拉。', emoji: '✨' },
+      { value: 'silver', label: '銀色', desc: '乾淨、俐落，適合清透與冷調系。', emoji: '◌' },
+      { value: 'black', label: '黑色', desc: '對比感強，讓整體更利落、有個性。', emoji: '⬛' }
+    ];
+    var selected = this.selections.metalType;
+    return '<h3>選擇金屬配件</h3><p class="custom-step-desc">搭配你的琉璃色系，決定五金質感。</p><div class="custom-options-grid">' +
       options.map(function(o) {
-        return '<div class="custom-option' + (selected === o.value ? ' selected' : '') + '" data-group="glassColor" data-value="' + o.value + '" style="border-left:4px solid ' + o.color + ';">' +
+        return '<div class="custom-option' + (selected === o.value ? ' selected' : '') + '" data-group="metalType" data-value="' + o.value + '">' +
           '<div class="custom-option-emoji">' + o.emoji + '</div>' +
-          '<div class="custom-option-label">' + o.label + '</div>' +
-          '<div class="custom-option-desc">' + o.desc + '</div>' +
+          '<div>' +
+            '<div class="custom-option-label">' + o.label + '</div>' +
+            '<div class="custom-option-desc">' + o.desc + '</div>' +
+          '</div>' +
           '<span class="selected-check">&#10003;</span>' +
         '</div>';
       }).join('') + '</div>';
   },
 
-  renderStep2: function() {
-    var self = this;
-    var options = [
-      { value: 'rose_gold', label: '玫瑰金', desc: '品牌經典色，溫暖優雅', emoji: '💎' },
-      { value: 'warm_gold', label: '暖金色', desc: '復古質感，華麗大氣', emoji: '✨' },
-      { value: 'silver', label: '銀色', desc: '簡約俐落，百搭不挑色', emoji: '⭐' },
-      { value: 'black', label: '黑色', desc: '個性酷感，低調帥氣', emoji: '🖤' }
-    ];
-    var selected = this.selections.metalType;
-    return '<h3>選擇金屬配件</h3><p class="custom-step-desc">搭配你的琉璃色系，決定五金質感</p><div class="custom-options-grid">' +
-      options.map(function(o) {
-        return '<div class="custom-option' + (selected === o.value ? ' selected' : '') + '" data-group="metalType" data-value="' + o.value + '">' +
-          '<div class="custom-option-emoji">' + o.emoji + '</div>' +
-          '<div class="custom-option-label">' + o.label + '</div>' +
-          '<div class="custom-option-desc">' + o.desc + '</div>' +
-        '<span class="selected-check">&#10003;</span>' +
-        '</div>';
-      }).join('') + '</div>';
-  },
-
   renderStep3: function() {
-    var self = this;
     var options = [
-      { value: 'choker', label: '短鏈 (~30cm)', desc: '頸鏈／手環長度', emoji: '📿' },
-      { value: 'medium', label: '中鏈 (~45cm)', desc: '標準手機鏈／項鍊長度', emoji: '📱' },
-      { value: 'long', label: '長鏈 (~60cm)', desc: '長項鍊／斜背手機鏈', emoji: '💫' },
-      { value: 'custom_length', label: '客製長度', desc: '告訴我你想要的長度', emoji: '📏' }
+      { value: 'choker', label: '短鏈 (~30cm)', desc: '靠近頸部，精緻感最明顯。', emoji: '📎' },
+      { value: 'medium', label: '中鏈 (~45cm)', desc: '最通用的長度，日常最不容易出錯。', emoji: '📏' },
+      { value: 'long', label: '長鏈 (~60cm)', desc: '垂墜感更強，視覺份量更足。', emoji: '〰️' },
+      { value: 'custom_length', label: '客製長度', desc: '如果你有明確尺寸，我們照你的需求做。', emoji: '✎' }
     ];
     var selected = this.selections.chainLength;
-    return '<h3>選擇長度</h3><p class="custom-step-desc">決定鏈條或掛繩的長度</p><div class="custom-options-grid">' +
+    return '<h3>選擇長度</h3><p class="custom-step-desc">決定鏈條或掛繩的長度。</p><div class="custom-options-grid">' +
       options.map(function(o) {
         return '<div class="custom-option' + (selected === o.value ? ' selected' : '') + '" data-group="chainLength" data-value="' + o.value + '">' +
           '<div class="custom-option-emoji">' + o.emoji + '</div>' +
-          '<div class="custom-option-label">' + o.label + '</div>' +
-          '<div class="custom-option-desc">' + o.desc + '</div>' +
-        '<span class="selected-check">&#10003;</span>' +
+          '<div>' +
+            '<div class="custom-option-label">' + o.label + '</div>' +
+            '<div class="custom-option-desc">' + o.desc + '</div>' +
+          '</div>' +
+          '<span class="selected-check">&#10003;</span>' +
         '</div>';
       }).join('') + '</div>';
   },
 
   renderStep4: function() {
-    var self = this;
     var options = [
-      { value: 'phone_strap', label: '手機鏈', desc: '手機掛繩／手腕鏈', emoji: '📱' },
-      { value: 'earrings', label: '耳環／耳掛', desc: '琉璃耳飾', emoji: '💎' },
-      { value: 'bracelet', label: '手鍊', desc: '琉璃手鍊', emoji: '📿' },
-      { value: 'necklace', label: '項鍊', desc: '琉璃項鍊／墜飾', emoji: '💫' },
-      { value: 'keychain', label: '鑰匙圈', desc: '包包掛飾／鑰匙圈', emoji: '🔑' },
-      { value: 'other', label: '其他', desc: '其他你想要的品項', emoji: '💭' }
+      { value: 'phone_strap', label: '手機掛繩', desc: '最直覺的使用方式。', emoji: '📱' },
+      { value: 'earrings', label: '耳飾', desc: '小巧、輕盈、好搭。', emoji: '👂' },
+      { value: 'bracelet', label: '手鍊', desc: '戴在手上也會有存在感。', emoji: '🖐' },
+      { value: 'necklace', label: '項鍊', desc: '想把琉璃放到更靠近臉的位置。', emoji: '⛓' },
+      { value: 'keychain', label: '鑰匙圈', desc: '最實用的隨身小物。', emoji: '🔑' },
+      { value: 'other', label: '其他', desc: '有自己的想法，也可以直接寫。', emoji: '✦' }
     ];
     var selected = this.selections.accessoryType;
-    return '<h3>選擇飾品類型</h3><p class="custom-step-desc">你想做什麼樣的飾品？</p><div class="custom-options-grid">' +
+    return '<h3>選擇飾品類型</h3><p class="custom-step-desc">你想做成什麼樣的用途？</p><div class="custom-options-grid">' +
       options.map(function(o) {
         return '<div class="custom-option' + (selected === o.value ? ' selected' : '') + '" data-group="accessoryType" data-value="' + o.value + '">' +
           '<div class="custom-option-emoji">' + o.emoji + '</div>' +
-          '<div class="custom-option-label">' + o.label + '</div>' +
-          '<div class="custom-option-desc">' + o.desc + '</div>' +
-        '<span class="selected-check">&#10003;</span>' +
+          '<div>' +
+            '<div class="custom-option-label">' + o.label + '</div>' +
+            '<div class="custom-option-desc">' + o.desc + '</div>' +
+          '</div>' +
+          '<span class="selected-check">&#10003;</span>' +
         '</div>';
       }).join('') + '</div>';
   },
 
   renderStep5: function() {
     var styleLabels = {
-      romantic_rose: '浪漫復古', clear_pastel: '清透日常', porcelain_blue: '霧藍瓷感',
-      sage_natural: '自然清新', midnight_luxury: '午夜精品'
+      romantic_rose: '浪漫復古',
+      clear_pastel: '清透日常',
+      porcelain_blue: '霧藍瓷感',
+      sage_natural: '自然清新',
+      midnight_luxury: '午夜精品'
     };
     var metalLabels = {
-      rose_gold: '玫瑰金', warm_gold: '暖金色', silver: '銀色', black: '黑色'
+      rose_gold: '玫瑰金',
+      warm_gold: '暖金',
+      silver: '銀色',
+      black: '黑色'
     };
     var lengthLabels = {
-      choker: '短鏈 (~30cm)', medium: '中鏈 (~45cm)', long: '長鏈 (~60cm)', custom_length: '客製長度'
+      choker: '短鏈 (~30cm)',
+      medium: '中鏈 (~45cm)',
+      long: '長鏈 (~60cm)',
+      custom_length: '客製長度'
     };
     var typeLabels = {
-      phone_strap: '手機鏈', earrings: '耳環／耳掛', bracelet: '手鍊',
-      necklace: '項鍊', keychain: '鑰匙圈', other: '其他'
+      phone_strap: '手機掛繩',
+      earrings: '耳飾',
+      bracelet: '手鍊',
+      necklace: '項鍊',
+      keychain: '鑰匙圈',
+      other: '其他'
     };
+    var selectedStyle = this.getStyleCard(this.selections.glassColor);
 
-    return '<h3>確認訂製內容</h3><p class="custom-step-desc">請確認你的選擇，沒問題就可以送出了</p>' +
+    return '<h3>確認訂製內容</h3><p class="custom-step-desc">如果沒問題，就把需求送出。我們會依照你選的風格開始整理。</p>' +
+      (selectedStyle ? '<div class="custom-summary-preview"><img src="' + selectedStyle.image + '" alt="' + selectedStyle.label + ' 情境圖"><div><div class="custom-summary-preview-kicker">你選的風格</div><strong>' + selectedStyle.label + '</strong><p>' + selectedStyle.desc + '</p></div></div>' : '') +
       '<div class="custom-summary">' +
         '<div class="custom-summary-row"><span>色系</span><strong>' + (styleLabels[this.selections.glassColor] || '—') + '</strong></div>' +
         '<div class="custom-summary-row"><span>金屬</span><strong>' + (metalLabels[this.selections.metalType] || '—') + '</strong></div>' +
@@ -207,11 +284,11 @@ var BME_CUSTOM = {
         '<div class="custom-summary-row"><span>類型</span><strong>' + (typeLabels[this.selections.accessoryType] || '—') + '</strong></div>' +
       '</div>' +
       '<div class="form-group" style="margin-top:24px;">' +
-        '<label class="form-label">補充描述（選填）</label>' +
-        '<textarea id="custom-desc" class="form-input" rows="3" placeholder="描述你夢想中的飾品，例如想要的顏色深淺、搭配想法、參考風格……" style="resize:vertical;">' + (this.selections.description || '') + '</textarea>' +
+        '<label class="form-label">補充描述</label>' +
+        '<textarea id="custom-desc" class="form-input" rows="3" placeholder="例如：想要更淡一點、偏金色一點、希望像送禮款、可接受的長度範圍……" style="resize:vertical;">' + (this.selections.description || '') + '</textarea>' +
       '</div>' +
       '<div class="custom-contact-info">' +
-        '<p style="font-size:13px;color:#888;">送出後我們會透過 IG 私訊與你聯繫討論細節與報價。</p>' +
+        '<p style="font-size:13px;color:#888;">送出後會引導你到 Instagram 私訊，方便我們把風格細節接上。</p>' +
       '</div>';
   },
 
@@ -222,22 +299,23 @@ var BME_CUSTOM = {
 
     BME_getUser().then(function(user) {
       if (!user) {
-        if (confirm('需要登入才能送出訂製需求。前往登入頁面？')) {
+        if (confirm('你目前尚未登入，送出訂製需求前要先登入嗎？')) {
           window.location.href = 'login.html?redirect=custom.html';
         }
         return;
       }
+
       BME_getProfile().then(function(profile) {
         var btn = document.getElementById('step-next-btn');
-        btn.disabled = true;
-        btn.textContent = '送出中…';
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = '送出中…';
+        }
 
-        var client = null;
-        initSupabase().then(function(c) {
-          client = c;
+        initSupabase().then(function(client) {
           return client.from('custom_orders').insert({
             user_id: user.id,
-            customer_name: profile?.nickname || '會員',
+            customer_name: (profile && profile.nickname) ? profile.nickname : '會員',
             glass_color: self.selections.glassColor,
             metal_type: self.selections.metalType,
             chain_length: self.selections.chainLength,
@@ -247,16 +325,19 @@ var BME_CUSTOM = {
         }).then(function() {
           document.getElementById('step-content').innerHTML =
             '<div class="custom-success">' +
-              '<div style="font-size:48px;margin-bottom:16px;">✅</div>' +
-              '<h3>訂製需求已送出！</h3>' +
-              '<p>我們會在 1-2 個工作天內透過 IG 私訊與你聯繫。</p>' +
-              '<a href="products.html" class="btn btn-primary" style="margin-top:16px;">繼續逛逛</a>' +
+              '<div style="font-size:48px;margin-bottom:16px;">✓</div>' +
+              '<h3>訂製需求已送出</h3>' +
+              '<p>我們會在 1-2 個工作天內透過 IG 私訊你，確認細節。</p>' +
+              '<a href="products.html" class="btn btn-primary" style="margin-top:16px;">繼續逛商品</a>' +
             '</div>';
-          document.getElementById('step-next-btn').style.display = 'none';
+          var nextBtn = document.getElementById('step-next-btn');
+          if (nextBtn) nextBtn.style.display = 'none';
         }).catch(function(err) {
-          btn.disabled = false;
-          btn.textContent = '確認送出';
-          alert('送出失敗，請稍後再試：' + (err.message || ''));
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = '送出訂製';
+          }
+          alert('送出失敗：' + (err && err.message ? err.message : '請稍後再試。'));
         });
       });
     });
