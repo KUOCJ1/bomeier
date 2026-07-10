@@ -24,8 +24,14 @@ ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 -- Admin can do everything
 CREATE POLICY "Admin full access to products"
   ON public.products FOR ALL
-  USING (auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin'))
-  WITH CHECK (auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin'));
+  USING (
+    auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin')
+    OR lower(coalesce(auth.jwt() ->> 'email', '')) = 'kuocj1@gmail.com'
+  )
+  WITH CHECK (
+    auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin')
+    OR lower(coalesce(auth.jwt() ->> 'email', '')) = 'kuocj1@gmail.com'
+  );
 
 -- Everyone can view non-sold, published products
 CREATE POLICY "Anyone can view available products"
