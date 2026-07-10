@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 210 297">
+  <defs>
+    <pattern id="linen" width="6" height="6" patternUnits="userSpaceOnUse">
+      <path d="M0 1 H6 M0 4 H6" stroke="#E3CDB8" stroke-width="0.14" opacity="0.45"/>
+      <path d="M1.5 0 V6 M4.5 0 V6" stroke="#F6EEE5" stroke-width="0.18" opacity="0.75"/>
+    </pattern>
+    <radialGradient id="soft" cx="50%" cy="42%" r="65%">
+      <stop offset="0" stop-color="#FFF9F1"/>
+      <stop offset="1" stop-color="#EAD1BA"/>
+    </radialGradient>
+  </defs>
+  <rect width="210" height="297" fill="url(#soft)"/>
+  <rect width="210" height="297" fill="url(#linen)" opacity="0.72"/>
+  <rect x="17" y="25" width="176" height="247" fill="none" stroke="#D2A17E" stroke-width="0.45" opacity="0.75"/>
+  <rect x="25" y="34" width="160" height="229" fill="none" stroke="#F8E9D9" stroke-width="0.35" opacity="0.75"/>
+  <rect x="41.5" y="64" width="127" height="159" fill="none" stroke="#AD7D5E" stroke-width="0.28" stroke-dasharray="1.6 2.4" opacity="0.32"/>
+  <rect x="52" y="86" width="106" height="106" fill="none" stroke="#AD7D5E" stroke-width="0.28" stroke-dasharray="1.6 2.4" opacity="0.30"/>
+  <path d="M49 238 C70 229 90 232 105 239 C125 247 146 243 163 232" fill="none" stroke="#D8B08A" stroke-width="0.55" opacity="0.42"/>
+  <text x="14" y="277" font-family="Georgia, 'Times New Roman', serif" font-size="4.8" fill="#AD7D5E" opacity="0.70">Bo Mei Er</text>
+  <text x="14" y="283" font-family="Arial, sans-serif" font-size="2.6" fill="#8A715E" opacity="0.58">Warm Linen Board</text>
+</svg>

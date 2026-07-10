@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <pattern id="dots" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+      <circle cx="40" cy="40" r="1.5" fill="#C9956B" opacity="0.12"/>
+    </pattern>
+    <pattern id="dots-large" x="0" y="0" width="160" height="160" patternUnits="userSpaceOnUse">
+      <circle cx="80" cy="80" r="2" fill="#C9956B" opacity="0.08"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="600" fill="transparent"/>
+  <rect width="800" height="600" fill="url(#dots)"/>
+  <rect width="800" height="600" fill="url(#dots-large)"/>
+
+  <!-- Decorative arcs -->
+  <path d="M -50 650 Q 200 100 450 650" fill="none" stroke="#C9956B" stroke-width="0.5" opacity="0.15"/>
+  <path d="M 350 650 Q 600 100 850 650" fill="none" stroke="#C9956B" stroke-width="0.5" opacity="0.15"/>
+  <path d="M 150 700 Q 400 250 650 700" fill="none" stroke="#D4A574" stroke-width="0.5" opacity="0.1"/>
+</svg>

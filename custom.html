@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="客製你夢想中的琉璃飾品 — 鉑魅兒半訂製服務">
+  <meta property="og:title" content="客製訂製 | 鉑魅兒 Bo Mei Er">
+  <meta property="og:description" content="選擇色系、金屬、長度，打造專屬於你的琉璃飾品。">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="images/brand/og-image.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="images/brand/logo-icon-64.png">
+  <link rel="stylesheet" href="css/style.css">
+  <title>客製訂製 | 鉑魅兒 Bo Mei Er</title>
+</head>
+<body>
+<nav class="nav scrolled">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><img src="images/brand/logo-nav.png" alt="Bo Mei Er" class="nav-logo-img"></a>
+    <button class="nav-toggle" aria-label="選單">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links">
+      <a href="products.html">全部商品</a>
+      <a href="custom.html" class="active">客製訂製</a>
+      <a href="about.html">關於</a>
+      <a href="journal.html">誌</a>
+      <div id="auth-nav-items"></div>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <div class="breadcrumb">
+    <a href="index.html">首頁</a><span class="separator">／</span><span>客製訂製</span>
+  </div>
+
+  <section class="section">
+    <div class="section-inner" style="max-width:700px;">
+      <div class="section-header">
+        <div class="section-divider-thick"></div>
+        <h2>打造你的夢想飾品</h2>
+        <p class="section-subtitle">Custom Order</p>
+        <p style="font-size:15px;color:#888;max-width:500px;margin:12px auto 0;">選色系、選金屬、選長度——我們幫你手作出來。</p>
+      </div>
+
+      <div class="custom-progress">
+        <div class="custom-progress-bar"><div class="custom-progress-fill" id="progress-bar"></div></div>
+        <span class="custom-step-label" id="step-number">1 / 5</span>
+      </div>
+
+      <div class="custom-step-container">
+        <div id="step-content">
+          <div class="skeleton-loading" style="padding:40px;text-align:center;">載入中…</div>
+        </div>
+
+        <div class="custom-nav">
+          <button class="btn btn-secondary" id="custom-prev-btn" style="display:none;">← 上一步</button>
+          <button class="btn btn-primary" id="step-next-btn">下一步 →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="images/brand/logo-white.png" alt="Bo Mei Er" class="footer-brand-img">
+      <p style="color:#888;font-size:14px;line-height:1.6;">琉璃手機鏈與選物｜每一顆琉璃都是手作，每一件選物都有故事。</p>
+    </div>
+    <div>
+      <h4>商品</h4>
+      <ul class="footer-links">
+        <li><a href="products.html">全部商品</a></li>
+        <li><a href="products.html?filter=new">新品上架</a></li>
+        <li><a href="custom.html">客製訂製</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>關於</h4>
+      <ul class="footer-links">
+        <li><a href="about.html">品牌故事</a></li>
+        <li><a href="journal.html">誌</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>追蹤我們</h4>
+      <ul class="footer-links">
+        <li><a href="https://www.instagram.com/bomeier/?utm_source=website&utm_medium=footer" target="_blank">Instagram</a></li>
+        <li><a href="https://www.instagram.com/bomeier/" target="_blank">LINE (IG私訊)</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>幫助</h4>
+      <ul class="footer-links">
+        <li><a href="policy.html">購物須知</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    &copy; 2026 鉑魅兒 Bo Mei Er. All rights reserved.
+  </div>
+</footer>
+
+<script src="js/supabase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/custom.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  BME_CUSTOM.init();
+});
+</script>
+</body>
+</html>
+
+

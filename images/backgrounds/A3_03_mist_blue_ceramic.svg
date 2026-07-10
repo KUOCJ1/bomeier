@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="420mm" viewBox="0 0 297 420">
+  <defs>
+    <linearGradient id="bluebg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F9FBFB"/>
+      <stop offset="1" stop-color="#DCEAF3"/>
+    </linearGradient>
+    <filter id="mist">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="22"/>
+      <feGaussianBlur stdDeviation="1.2"/>
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.14"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+  <rect width="297" height="420" fill="url(#bluebg)"/>
+  <rect width="297" height="420" filter="url(#mist)" opacity="0.55"/>
+  <circle cx="230" cy="76" r="46" fill="#FFFFFF" opacity="0.34"/>
+  <circle cx="230" cy="76" r="34" fill="none" stroke="#8CB7CE" stroke-width="0.45" opacity="0.32"/>
+  <path d="M54 324 C102 291 174 291 242 324" fill="none" stroke="#91B8CD" stroke-width="0.65" opacity="0.42"/>
+  <path d="M58 332 C103 302 176 302 239 332" fill="none" stroke="#FFFFFF" stroke-width="0.55" opacity="0.60"/>
+  <rect x="58.5" y="91" width="180" height="225" fill="none" stroke="#5C91AD" stroke-width="0.35" stroke-dasharray="2 3" opacity="0.34"/>
+  <rect x="73.5" y="121.5" width="150" height="150" fill="none" stroke="#5C91AD" stroke-width="0.35" stroke-dasharray="2 3" opacity="0.30"/>
+  <text x="20" y="392" font-family="Georgia, 'Times New Roman', serif" font-size="6" fill="#477B96" opacity="0.70">Bo Mei Er</text>
+  <text x="20" y="400" font-family="Arial, sans-serif" font-size="3.2" fill="#5E7784" opacity="0.58">Mist Blue Ceramic</text>
+</svg>

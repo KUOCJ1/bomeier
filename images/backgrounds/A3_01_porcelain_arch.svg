@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="420mm" viewBox="0 0 297 420">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FCF8F2"/>
+      <stop offset="1" stop-color="#EFE3D6"/>
+    </linearGradient>
+    <filter id="paper">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="11"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.045"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+  <rect width="297" height="420" fill="url(#bg)"/>
+  <rect width="297" height="420" filter="url(#paper)" opacity="0.55"/>
+  <path d="M58 314 V126 C58 76 95 43 148.5 43 C202 43 239 76 239 126 V314 Z" fill="#F8F1EA" stroke="#D7B08B" stroke-width="0.8"/>
+  <path d="M70 302 V131 C70 89 103 60 148.5 60 C194 60 227 89 227 131 V302 Z" fill="none" stroke="#E5CBB1" stroke-width="0.5"/>
+  <rect x="58.5" y="91" width="180" height="225" fill="none" stroke="#B98D68" stroke-width="0.35" stroke-dasharray="2 3" opacity="0.38"/>
+  <rect x="73.5" y="121.5" width="150" height="150" fill="none" stroke="#B98D68" stroke-width="0.35" stroke-dasharray="2 3" opacity="0.34"/>
+  <circle cx="148.5" cy="203.5" r="2.3" fill="#C9956B" opacity="0.23"/>
+  <text x="20" y="392" font-family="Georgia, 'Times New Roman', serif" font-size="6" fill="#B98D68" opacity="0.68">Bo Mei Er</text>
+  <text x="20" y="400" font-family="Arial, sans-serif" font-size="3.2" fill="#8A715E" opacity="0.58">Glass Beads & Accessories</text>
+</svg>
