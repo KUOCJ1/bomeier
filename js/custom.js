@@ -16,47 +16,52 @@ var BME_CUSTOM = {
     {
       value: 'romantic_rose',
       label: '浪漫復古',
-      desc: '玫瑰金、粉嫩色系，適合送禮、約會與溫柔穿搭。',
-      note: '柔和暖調',
+      scene: '送禮 / 約會 / 柔和穿搭',
+      feel: '柔和暖調',
       image: 'images/products/BM-T007_main.jpg',
       productName: '櫻花雨',
-      accent: '#D4A574'
+      accent: '#D4A574',
+      colorLabel: '玫瑰金、粉嫩色系'
     },
     {
       value: 'clear_pastel',
       label: '清透日常',
-      desc: '透明琉璃、淺色系，乾淨百搭，最不挑手機殼。',
-      note: '極簡通勤',
+      scene: '通勤 / 百搭 / 透明殼',
+      feel: '極簡通勤',
       image: 'images/products/BM-T001_main.jpg',
       productName: '晨光序曲',
-      accent: '#A8D8EA'
+      accent: '#A8D8EA',
+      colorLabel: '透明、淺色系'
     },
     {
       value: 'porcelain_blue',
       label: '霧藍瓷感',
-      desc: '藍灰色調、安靜內斂，適合喜歡冷感質地的人。',
-      note: '靜謐質感',
+      scene: '冷調 / 安靜 / 質感穿搭',
+      feel: '靜謐質感',
       image: 'images/products/BM-T015_main.jpg',
       productName: '海洋藍調',
-      accent: '#8FB8C9'
+      accent: '#8FB8C9',
+      colorLabel: '藍灰色調、霧感珠串'
     },
     {
       value: 'sage_natural',
       label: '自然清新',
-      desc: '大地色與植物感，放鬆、耐看、日常使用很舒服。',
-      note: '自然系',
+      scene: '日常 / 旅行 / 大地色',
+      feel: '自然系',
       image: 'images/products/BM-T014_main.jpg',
       productName: '森林物語',
-      accent: '#7BAE7F'
+      accent: '#7BAE7F',
+      colorLabel: '大地色、植物感'
     },
     {
       value: 'midnight_luxury',
       label: '午夜精品',
-      desc: '深色背景、金屬光澤，低調但有份量，夜色感明顯。',
-      note: '高級夜色',
+      scene: '夜晚 / 低調 / 金屬感',
+      feel: '高級夜色',
       image: 'images/products/BM-T017_main.jpg',
       productName: '星河漫夜',
-      accent: '#0A1628'
+      accent: '#0A1628',
+      colorLabel: '深色背景、金屬光澤'
     }
   ],
 
@@ -164,26 +169,31 @@ var BME_CUSTOM = {
 
   renderStep1: function() {
     var selected = this.selections.glassColor;
-    return '<div class="custom-step-intro">' +
-      '<h3>先看風格，再選細節</h3>' +
-      '<p class="custom-step-desc">同一個手機配件，換不同場景就會長出不同氣質。先看圖，會比只看文字更快分辨差異。</p>' +
+    return '' +
+      '<div class="custom-step-intro">' +
+        '<h3>先看風格，再選細節</h3>' +
+        '<p class="custom-step-desc">這一步不是選顏色而已，是先看你的手機鏈會長什麼氣質。每張圖都對應一個代表風格，讓差異先被看見。</p>' +
       '</div>' +
       '<div class="custom-style-grid">' +
-      this.styleCards.map(function(card) {
-        return '<button type="button" class="custom-option custom-style-option' + (selected === card.value ? ' selected' : '') + '" data-group="glassColor" data-value="' + card.value + '" style="--accent:' + card.accent + ';">' +
-          '<div class="custom-option-image">' +
-            '<img src="' + card.image + '" alt="' + card.label + ' 情境圖">' +
-            '<span class="custom-style-note">' + card.note + '</span>' +
-          '</div>' +
-          '<div class="custom-option-copy">' +
-            '<div class="custom-option-kicker">Style Preview</div>' +
-            '<div class="custom-option-label">' + card.label + '</div>' +
-            '<div class="custom-option-desc">代表款：' + card.productName + '</div>' +
-            '<div class="custom-option-desc">' + card.desc + '</div>' +
-          '</div>' +
-          '<span class="selected-check">&#10003;</span>' +
-        '</button>';
-      }).join('') + '</div>';
+        this.styleCards.map(function(card) {
+          var activeClass = selected === card.value ? ' selected' : '';
+          return '' +
+            '<button type="button" class="custom-option custom-style-option' + activeClass + '" data-group="glassColor" data-value="' + card.value + '" style="--accent:' + card.accent + ';">' +
+              '<div class="custom-option-image">' +
+                '<img src="' + card.image + '" alt="' + card.label + ' 代表款情境圖">' +
+                '<span class="custom-style-note">' + card.feel + '</span>' +
+              '</div>' +
+              '<div class="custom-option-copy">' +
+                '<div class="custom-option-kicker">Style Preview</div>' +
+                '<div class="custom-option-label">' + card.label + '</div>' +
+                '<div class="custom-option-desc">代表款：' + card.productName + '</div>' +
+                '<div class="custom-option-desc">適合場景：' + card.scene + '</div>' +
+                '<div class="custom-option-desc">一眼感受：' + card.colorLabel + '</div>' +
+              '</div>' +
+              '<span class="selected-check">&#10003;</span>' +
+            '</button>';
+        }).join('') +
+      '</div>';
   },
 
   renderStep2: function() {
@@ -282,7 +292,7 @@ var BME_CUSTOM = {
     var selectedStyle = this.getStyleCard(this.selections.glassColor);
 
     return '<h3>確認訂製內容</h3><p class="custom-step-desc">如果沒問題，就把需求送出。我們會依照你選的風格開始整理。</p>' +
-      (selectedStyle ? '<div class="custom-summary-preview"><img src="' + selectedStyle.image + '" alt="' + selectedStyle.label + ' 情境圖"><div><div class="custom-summary-preview-kicker">你選的風格</div><strong>' + selectedStyle.label + '</strong><p>' + selectedStyle.desc + '</p></div></div>' : '') +
+      (selectedStyle ? '<div class="custom-summary-preview"><img src="' + selectedStyle.image + '" alt="' + selectedStyle.label + ' 代表款"><div><div class="custom-summary-preview-kicker">你選的風格</div><strong>' + selectedStyle.label + '</strong><p>代表款：' + selectedStyle.productName + '</p><p>' + selectedStyle.colorLabel + '，適合場景：' + selectedStyle.scene + '</p></div></div>' : '') +
       '<div class="custom-summary">' +
         '<div class="custom-summary-row"><span>色系</span><strong>' + (styleLabels[this.selections.glassColor] || '—') + '</strong></div>' +
         '<div class="custom-summary-row"><span>金屬</span><strong>' + (metalLabels[this.selections.metalType] || '—') + '</strong></div>' +
