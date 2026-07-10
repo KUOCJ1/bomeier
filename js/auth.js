@@ -72,6 +72,37 @@ async function BME_login(email, password) {
   return data;
 }
 
+async function BME_sendPasswordReset(email, redirectTo) {
+  const client = await initSupabase();
+  if (!client) throw new Error('Supabase 尚未設定');
+
+  const options = redirectTo ? { redirectTo: redirectTo } : {};
+  const { data, error } = await client.auth.resetPasswordForEmail(email, options);
+  if (error) {
+    var errMsg = error.message;
+    if (!errMsg || errMsg === '{}' || errMsg === '[object Object]' || error.status === 500) {
+      errMsg = '無法寄出重設信，請稍後再試。';
+    }
+    throw new Error(errMsg);
+  }
+  return data;
+}
+
+async function BME_updatePassword(password) {
+  const client = await initSupabase();
+  if (!client) throw new Error('Supabase 尚未設定');
+
+  const { data, error } = await client.auth.updateUser({ password: password });
+  if (error) {
+    var errMsg = error.message;
+    if (!errMsg || errMsg === '{}' || errMsg === '[object Object]' || error.status === 500) {
+      errMsg = '更新密碼失敗，請再試一次。';
+    }
+    throw new Error(errMsg);
+  }
+  return data;
+}
+
 async function BME_logout() {
   const client = await initSupabase();
   if (!client) return;
