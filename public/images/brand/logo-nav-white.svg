@@ -1,0 +1,53 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 44" width="200" height="44">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C9956B"/>
+      <stop offset="40%" stop-color="#D4A574"/>
+      <stop offset="100%" stop-color="#B8805A"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#B8805A"/>
+      <stop offset="100%" stop-color="#C9956B"/>
+    </linearGradient>
+    <radialGradient id="beadShine" cx="35%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.7"/>
+      <stop offset="40%" stop-color="#FFFFFF" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#C9956B" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="beadShadow" cx="60%" cy="70%" r="50%">
+      <stop offset="0%" stop-color="#8B6040" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#8B6040" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="0.8" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g transform="translate(20, 22)">
+    <circle cx="0" cy="0" r="19" fill="none" stroke="url(#g1)" stroke-width="0.5" opacity="0.3"/>
+    <circle cx="0" cy="0" r="16" fill="url(#g1)" opacity="0.15"/>
+    <circle cx="0" cy="0" r="16" fill="none" stroke="url(#g1)" stroke-width="2"/>
+    <circle cx="0" cy="0" r="11" fill="none" stroke="url(#g2)" stroke-width="0.8" opacity="0.45"/>
+    <circle cx="0" cy="0" r="16" fill="url(#beadShadow)"/>
+    <circle cx="0" cy="0" r="16" fill="url(#beadShine)"/>
+    <path d="M -10,-10 A 13,13 0 0,1 6,-14" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
+    <ellipse cx="9" cy="8" rx="3.5" ry="2" fill="#FFFFFF" opacity="0.2" transform="rotate(-25, 9, 8)"/>
+    <circle cx="0" cy="0" r="2.5" fill="#C9956B" opacity="0.4"/>
+    <circle cx="0" cy="-24" r="1.8" fill="url(#g1)" opacity="0.6" filter="url(#glow)"/>
+    <circle cx="22" cy="-14" r="1.3" fill="url(#g1)" opacity="0.45"/>
+    <circle cx="24" cy="0" r="1.5" fill="url(#g1)" opacity="0.5"/>
+    <circle cx="0" cy="24" r="1.8" fill="url(#g1)" opacity="0.6" filter="url(#glow)"/>
+    <circle cx="-24" cy="0" r="1.5" fill="url(#g1)" opacity="0.5"/>
+  </g>
+
+  <text x="52" y="25" font-family="'Playfair Display', Georgia, serif" font-size="21"
+        font-weight="700" fill="#FFFFFF" letter-spacing="2.5">Bo</text>
+  <text x="83" y="25" font-family="'Playfair Display', Georgia, serif" font-size="21"
+        font-weight="400" fill="#C9956B" letter-spacing="2.5" font-style="italic">Mei</text>
+  <text x="131" y="25" font-family="'Playfair Display', Georgia, serif" font-size="21"
+        font-weight="700" fill="#FFFFFF" letter-spacing="2.5">Er</text>
+</svg>

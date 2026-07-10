@@ -1,0 +1,202 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="鉑魅兒手作琉璃配飾商品詳情——材質、風格、價格一覽。">
+  <meta property="og:title" content="商品詳情 | 鉑魅兒 Bo Mei Er">
+  <meta property="og:description" content="鉑魅兒手作琉璃配飾商品詳情。">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="images/brand/og-image.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="images/brand/logo-icon-64.png">
+  <link rel="stylesheet" href="css/style.css">
+  <title>商品詳情 | 鉑魅兒 Bo Mei Er</title>
+</head>
+<body>
+<nav class="nav scrolled">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><img src="images/brand/logo-nav.png" alt="Bo Mei Er" class="nav-logo-img"></a>
+    <button class="nav-toggle" aria-label="選單"><span></span><span></span><span></span></button>
+    <div class="nav-links">
+      <a href="products.html">全部商品</a><a href="custom.html">客製訂製</a>
+      <a href="about.html">關於</a>
+      <a href="journal.html">誌</a>
+    <div id="auth-nav-items"></div></div>
+  </div>
+</nav>
+
+<main>
+  <div class="breadcrumb">
+    <a href="index.html">首頁</a><span class="separator">／</span>
+    <a href="products.html">全部商品</a><span class="separator">／</span>
+    <span id="breadcrumb-product">商品詳情</span>
+  </div>
+
+  <section class="product-detail">
+    <div class="product-detail-inner">
+      <div class="product-images">
+        <div class="product-main-image">
+          <div class="product-card-placeholder" style="height:100%;">載入中…</div>
+        </div>
+        <div class="product-thumbnails"></div>
+      </div>
+      <div class="product-info">
+        <h1 id="product-name">載入中…</h1>
+        <div class="product-meta">
+          <span class="product-meta-item" id="product-style">—</span>
+          <span class="product-meta-item">#<span id="product-material">—</span></span>
+        </div>
+        <div class="product-price-status">
+          <div class="price-label">價格</div>
+          <div class="price-value" id="product-price">私訊詢價</div>
+          <div style="margin-top:8px;"><span style="font-size:12px;color:#999;">狀態：</span><span id="product-status" style="font-size:12px;color:#7BAE7F;font-weight:500;">—</span></div>
+        </div>
+        <div class="product-description" id="product-description">載入中…</div>
+        <button class="fav-btn fav-btn-detail" data-sku="" id="fav-btn" onclick="BME_toggleFavorite(this.dataset.sku)" aria-label="加入收藏">♡ 加入收藏</button>
+        <div class="product-cta-section">
+          <a href="#" class="btn btn-primary" id="cta-btn">私訊詢問</a>
+          <button class="btn btn-secondary" onclick="history.back()">回上頁</button>
+          <button class="btn btn-primary" id="add-to-cart-btn" onclick="BME_addToCart(window.currentProductSku)" style="margin-top:8px;">🛒 加入購物車</button>
+        </div>
+        <div class="product-tags" id="product-tags"></div>
+      </div>
+    </div>
+
+    <div id="related-products" style="display:none;margin-top:80px;padding-top:48px;border-top:1px solid rgba(10,22,40,0.06);">
+      <div class="section-header" style="margin-bottom:32px;">
+        <div class="section-divider-thick"></div>
+        <h2 style="font-size:22px;">你可能也會喜歡</h2>
+        <p class="section-subtitle" style="font-size:12px;">You May Also Like</p>
+      </div>
+      <div class="product-grid related-grid" style="grid-template-columns:repeat(4,1fr);"></div>
+    </div>
+
+    <div style="margin-top:40px;padding-top:32px;border-top:1px solid rgba(10,22,40,0.06);text-align:center;">
+      <p style="font-size:13px;color:#999;margin-bottom:12px;">分享這件商品</p>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <a id="share-line" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:#06C755;color:#fff;border-radius:6px;font-size:13px;text-decoration:none;">LINE</a>
+        <a id="share-fb" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:#1877F2;color:#fff;border-radius:6px;font-size:13px;text-decoration:none;">Facebook</a>
+        <button id="share-copy" onclick="navigator.clipboard.writeText(window.location.href).then(function(){var b=document.getElementById('share-copy');b.textContent='已複製';setTimeout(function(){b.textContent='複製連結';},2000);})" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:#888;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;">複製連結</button>
+      </div>
+    </div>
+
+  <div class="handmade-notice">
+    <div class="handmade-notice-inner">
+      <div class="handmade-notice-icon">&#9995;</div>
+      <h3>全手工串珠 · 每一件都獨一無二</h3>
+      <p>鉑魅兒的所有商品皆為手工串珠而成，串珠與金屬零件均為手工製作、玻璃與陶瓷配件則經過高溫燒製。每一顆琉璃珠的色澤、紋理與形狀都有自己的個性——這正是手作的迷人之處。</p>
+      <p class="handmade-notice-emphasis">但這也意味著，難免會有一些自然的「痕跡」：</p>
+      <ul>
+        <li>琉璃珠的孔洞可能有些微落差</li>
+        <li>串珠排列可能不完全對齊</li>
+        <li>陶瓷或琉璃表面的圖案可能有不規則變化</li>
+      </ul>
+      <p>這些都不是瑕疵——它們是手作過程中留下的溫度與真實感。</p>
+      <div class="handmade-notice-box">
+        <h4>購物前請確認</h4>
+        <p>如果您是完美主義者，無法接受手工製品自然產生的細微不對稱、孔洞落差或圖案變化，請斟酌後再下單。</p>
+      </div>
+      <div class="handmade-notice-box">
+        <h4>退換貨原則</h4>
+        <p>僅在商品整體使用上發生功能性問題，或出現重大瑕疵（如斷裂、嚴重破損、五金脫落影響使用）時，才接受退換貨。</p>
+        <p class="handmade-notice-note">因個人主觀感受（如「顏色與照片不符」「不如想像中完美」）或因手工特性產生的細微差異，恕不接受退換貨。</p>
+      </div>
+    </div>
+  </div>
+
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="images/brand/logo-white.png" alt="Bo Mei Er" class="footer-brand-img">
+      <p style="color:#888;font-size:14px;line-height:1.6;">琉璃手機鏈與選物｜每一顆琉璃都是手作，每一件選物都有故事。</p>
+    </div>
+    <div>
+      <h4>商品</h4>
+      <ul class="footer-links">
+        <li><a href="products.html">全部商品</a></li>
+        <li><a href="products.html?filter=new">新品上架</a></li><li><a href="custom.html">客製訂製</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>關於</h4>
+      <ul class="footer-links">
+        <li><a href="about.html">品牌故事</a></li>
+        <li><a href="journal.html">誌</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>追蹤我們</h4>
+      <ul class="footer-links">
+        <li><a href="https://www.instagram.com/bomeier/?utm_source=website&utm_medium=footer" target="_blank">Instagram</a></li>
+        <li><a href="https://www.instagram.com/bomeier/" target="_blank" title="LINE官方帳號籌備中，歡迎先透過IG私訊">LINE (IG私訊)</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>幫助</h4>
+      <ul class="footer-links">
+        <li><a href="policy.html">購物須知</a></li>
+        <li><a href="admin/orders.html" style="color:#888;">管理後台</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    &copy; 2026 鉑魅兒 Bo Mei Er. All rights reserved.
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/products.js"></script>
+<script src="js/favorites.js"></script>
+<script>
+(function() {
+  // Timeout safety: show error if data doesn't load within 10 seconds
+  var _bmeTimeout = setTimeout(function() {
+    var pn = document.getElementById("product-name");
+    var pd = document.getElementById("product-description");
+    if (pn && pn.textContent === "載入中…") {
+      pn.textContent = "載入逾時";
+      if (pd) pd.innerHTML = "商品資料載入逾時，請重整頁面或檢查網路連線。";
+    }
+  }, 10000);
+
+  try {
+    document.addEventListener("DOMContentLoaded", async function() {
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var sku = params.get("sku");
+        if (!sku) {
+          clearTimeout(_bmeTimeout);
+          document.getElementById("product-name").textContent = "未指定商品";
+          document.getElementById("product-description").innerHTML = "請從商品列表選擇一款商品。";
+          return;
+        }
+        window.currentProductSku = sku;
+        await BME.loadProducts();
+        clearTimeout(_bmeTimeout);
+        BME.renderDetail(sku);
+        BME.renderRelated(sku);
+      } catch (e) {
+        clearTimeout(_bmeTimeout);
+        console.error("Product detail init failed:", e);
+        document.getElementById("product-name").textContent = "無法載入商品";
+        document.getElementById("product-description").innerHTML = "載入商品時發生錯誤，請返回商品列表重新選擇。";
+      }
+    });
+  } catch (e) {
+    console.error("Fatal error:", e);
+  }
+})();
+</script>
+</body>
+</html>
+
+

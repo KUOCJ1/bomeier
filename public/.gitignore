@@ -1,0 +1,17 @@
+﻿# Raw product photos (too large for git, kept for local reference)
+images/products/raw/
+
+# Generated scripts (may contain API tokens)
+_gen*.js
+
+# Node modules and test scripts
+node_modules/
+_*.js
+*.png
+
+# Raw product photos (not part of website assets)
+images/products/IMG_*.JPG
+
+# Node.js lock file (local tooling only)
+package-lock.json
+

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 210 297">
+  <defs>
+    <radialGradient id="sagebg" cx="45%" cy="36%" r="76%">
+      <stop offset="0" stop-color="#FAF7EF"/>
+      <stop offset="1" stop-color="#DCE8D4"/>
+    </radialGradient>
+  </defs>
+  <rect width="210" height="297" fill="url(#sagebg)"/>
+  <g fill="none" stroke="#95AA86" stroke-width="0.36" opacity="0.34">
+    <path d="M34 222 C45 201 45 180 35 158"/>
+    <path d="M35 168 C47 168 54 162 58 152"/>
+    <path d="M39 187 C51 185 59 178 64 168"/>
+    <path d="M36 205 C50 204 58 195 62 184"/>
+    <path d="M177 70 C164 91 164 113 176 134"/>
+    <path d="M174 82 C163 82 156 89 151 99"/>
+    <path d="M171 103 C160 104 153 112 148 122"/>
+  </g>
+  <rect x="23" y="30" width="164" height="237" fill="none" stroke="#9CAF8D" stroke-width="0.45" opacity="0.56"/>
+  <rect x="41.5" y="64" width="127" height="159" fill="none" stroke="#6F8B60" stroke-width="0.28" stroke-dasharray="1.6 2.4" opacity="0.32"/>
+  <rect x="52" y="86" width="106" height="106" fill="none" stroke="#6F8B60" stroke-width="0.28" stroke-dasharray="1.6 2.4" opacity="0.30"/>
+  <text x="14" y="277" font-family="Georgia, 'Times New Roman', serif" font-size="4.8" fill="#6F8B60" opacity="0.70">Bo Mei Er</text>
+  <text x="14" y="283" font-family="Arial, sans-serif" font-size="2.6" fill="#6B7864" opacity="0.58">Sage Botanical Board</text>
+</svg>

@@ -1,0 +1,148 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="登入鉑魅兒會員。">
+  <meta property="og:title" content="登入 | 鉑魅兒 Bo Mei Er">
+  <meta property="og:description" content="登入你的鉑魅兒帳號。">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="images/brand/og-image.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="images/brand/logo-icon-64.png">
+  <link rel="stylesheet" href="css/style.css">
+  <title>登入 | 鉑魅兒 Bo Mei Er</title>
+</head>
+<body>
+<nav class="nav scrolled">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><img src="images/brand/logo-nav.png" alt="Bo Mei Er" class="nav-logo-img"></a>
+    <button class="nav-toggle" aria-label="選單">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links">
+      <a href="products.html">全部商品</a><a href="custom.html">客製訂製</a>
+      <a href="about.html">關於</a>
+      <a href="journal.html">誌</a>
+      <div id="auth-nav-items"></div>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <div class="breadcrumb">
+    <a href="index.html">首頁</a><span class="separator">／</span><span>登入</span>
+  </div>
+
+  <section class="section">
+    <div class="section-inner" style="max-width:480px;">
+      <div class="section-header">
+        <div class="section-divider-thick"></div>
+        <h2>會員登入</h2>
+        <p class="section-subtitle">Sign In</p>
+      </div>
+
+      <div id="login-form-wrap">
+        <div id="login-error" class="form-error" style="display:none;"></div>
+
+        <form id="login-form" onsubmit="return handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email</label>
+            <input type="email" id="login-email" class="form-input" placeholder="example@email.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="login-password">密碼</label>
+            <input type="password" id="login-password" class="form-input" placeholder="輸入密碼" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px;" id="login-submit-btn">登入</button>
+        </form>
+
+        <p style="text-align:center;margin-top:24px;font-size:14px;color:#888;">
+          還沒有帳號？<a href="register.html">註冊</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="images/brand/logo-white.png" alt="Bo Mei Er" class="footer-brand-img">
+      <p style="color:#888;font-size:14px;line-height:1.6;">琉璃手機鏈與選物｜每一顆琉璃都是手作，每一件選物都有故事。</p>
+    </div>
+    <div>
+      <h4>商品</h4>
+      <ul class="footer-links">
+        <li><a href="products.html">全部商品</a></li>
+        <li><a href="products.html?filter=new">新品上架</a></li><li><a href="custom.html">客製訂製</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>關於</h4>
+      <ul class="footer-links">
+        <li><a href="about.html">品牌故事</a></li>
+        <li><a href="journal.html">誌</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>追蹤我們</h4>
+      <ul class="footer-links">
+        <li><a href="https://www.instagram.com/bomeier/?utm_source=website&utm_medium=footer" target="_blank">Instagram</a></li>
+        <li><a href="https://www.instagram.com/bomeier/" target="_blank" title="LINE官方帳號籌備中，歡迎先透過IG私訊">LINE (IG私訊)</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>幫助</h4>
+      <ul class="footer-links">
+        <li><a href="policy.html">購物須知</a></li><li><a href="admin/orders.html" style="color:#888;">管理後台</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    &copy; 2026 鉑魅兒 Bo Mei Er. All rights reserved.
+  </div>
+</footer>
+
+<script src="js/supabase-config.js"></script>
+<script src="js/auth.js"></script>
+<script>
+async function handleLogin(event) {
+  event.preventDefault();
+  const btn = document.getElementById('login-submit-btn');
+  const errorEl = document.getElementById('login-error');
+
+  errorEl.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = '登入中…';
+
+  try {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    await BME_login(email, password);
+
+    // 登入成功，導回原本頁面或首頁
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get('redirect') || 'index.html';
+    window.location.href = redirect;
+  } catch (err) {
+    errorEl.textContent = (err && err.message) ? err.message : '登入失敗，請檢查 Email 與密碼。';
+    errorEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '登入';
+  }
+  return false;
+}
+</script>
+</body>
+</html>
+
+
+
+
