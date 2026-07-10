@@ -54,6 +54,71 @@
   margin-bottom: 16px;
 }
 
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-stat-card {
+  background: #fff;
+  border: 1px solid #E7E0DA;
+  border-radius: 8px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 8px rgba(10,22,40,0.04);
+}
+
+.admin-stat-card span {
+  display: block;
+  color: #777;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.admin-stat-card strong {
+  display: block;
+  color: #0A1628;
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.admin-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(160px, 220px) auto;
+  align-items: end;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #E7E0DA;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(10,22,40,0.04);
+}
+
+.admin-controls label {
+  color: #444;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.admin-thumb,
+.admin-thumb-placeholder {
+  width: 54px;
+  height: 54px;
+  border-radius: 6px;
+  display: block;
+}
+
+.admin-thumb {
+  object-fit: cover;
+  background: #E7E0DA;
+}
+
+.admin-thumb-placeholder {
+  background: #E7E0DA;
+}
+
 .admin-table {
   width: 100%;
   border-collapse: collapse;
@@ -156,6 +221,53 @@
   color: #333;
   font-weight: 500;
 }
+
+.admin-field-help {
+  margin: -8px 0 12px;
+  color: #777;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.admin-image-preview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 8px 0 18px;
+}
+
+.admin-image-preview-item {
+  margin: 0;
+  border: 1px solid #E7E0DA;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #FBF8F4;
+}
+
+.admin-image-preview-item img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: #E7E0DA;
+}
+
+.admin-image-preview-item figcaption {
+  padding: 8px;
+  color: #777;
+  font-size: 11px;
+  word-break: break-all;
+}
+
+.admin-image-empty {
+  grid-column: 1 / -1;
+  border: 1px dashed #D5CDC4;
+  border-radius: 8px;
+  color: #888;
+  padding: 18px;
+  text-align: center;
+  font-size: 13px;
+}
 .admin-input {
   display: block;
   width: 100%;
@@ -199,6 +311,10 @@ textarea.admin-input {
   cursor: pointer;
   transition: background 0.2s;
 }
+.btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
 .btn-primary {
   background: #0A1628;
   color: #fff;
@@ -238,6 +354,18 @@ textarea.admin-input {
 
   .admin-toolbar {
     flex-direction: column;
+  }
+
+  .admin-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-image-preview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .admin-main {

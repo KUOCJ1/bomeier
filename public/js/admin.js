@@ -101,6 +101,51 @@ var BME_ADMIN = {
     container.innerHTML = '<div class="empty-state"><p>' + this.escapeHtml(message) + '</p></div>';
   },
 
+  renderStatCards: function(cards) {
+    return '<div class="admin-stats">' + cards.map(function(card) {
+      return '<div class="admin-stat-card">' +
+        '<span>' + BME_ADMIN.escapeHtml(card.label) + '</span>' +
+        '<strong>' + BME_ADMIN.escapeHtml(card.value) + '</strong>' +
+      '</div>';
+    }).join('') + '</div>';
+  },
+
+  getControlValue: function(id) {
+    var node = document.getElementById(id);
+    return node ? node.value.trim() : '';
+  },
+
+  matchesText: function(value, keyword) {
+    if (!keyword) return true;
+    return String(value || '').toLowerCase().indexOf(keyword.toLowerCase()) >= 0;
+  },
+
+  renderImagePreview: function(textareaId, previewId, folder) {
+    var source = document.getElementById(textareaId);
+    var preview = document.getElementById(previewId);
+    if (!source || !preview) return;
+    var images = this.parseList(source.value).slice(0, 4);
+    if (images.length === 0) {
+      preview.innerHTML = '<div class="admin-image-empty">尚未填寫圖片</div>';
+      return;
+    }
+    preview.innerHTML = images.map(function(img) {
+      var src = BME_ADMIN.imageSrc(img, folder);
+      return '<figure class="admin-image-preview-item">' +
+        '<img src="' + BME_ADMIN.escapeHtml(src) + '" alt="圖片預覽" loading="lazy">' +
+        '<figcaption>' + BME_ADMIN.escapeHtml(img) + '</figcaption>' +
+      '</figure>';
+    }).join('');
+  },
+
+  setButtonBusy: function(buttonId, busy, label) {
+    var btn = document.getElementById(buttonId);
+    if (!btn) return;
+    if (!btn.dataset.originalText) btn.dataset.originalText = btn.textContent;
+    btn.disabled = !!busy;
+    btn.textContent = busy ? (label || '處理中…') : btn.dataset.originalText;
+  },
+
   renderOrders: function() {
     var container = document.getElementById('admin-panel-content');
     if (!container) return;
@@ -116,8 +161,18 @@ var BME_ADMIN = {
 
         var statusLabels = { pending: '待確認', confirmed: '已確認', shipped: '已出貨', completed: '已完成', cancelled: '已取消', refunded: '已退款' };
         var statusColors = { pending: '#D4A574', confirmed: '#8FB8C9', shipped: '#7BAE7F', completed: '#0A1628', cancelled: '#C97B6B', refunded: '#999' };
+        var pendingCount = orders.filter(function(o) { return o.status === 'pending'; }).length;
+        var openCount = orders.filter(function(o) { return ['pending', 'confirmed', 'shipped'].indexOf(o.status) >= 0; }).length;
+        var revenue = orders.reduce(function(sum, o) { return sum + (parseInt(o.amount, 10) || 0); }, 0);
 
-        var html = '<div style="overflow-x:auto;"><table class="admin-table"><thead><tr>' +
+        var html = '<div class="admin-toolbar"><div><h2 style="margin:0;font-size:18px;color:#0A1628;">訂單管理</h2><p style="margin:4px 0 0;color:#777;font-size:13px;">追蹤一般商品訂單狀態。</p></div></div>';
+        html += BME_ADMIN.renderStatCards([
+          { label: '訂單總數', value: orders.length },
+          { label: '待確認', value: pendingCount },
+          { label: '處理中', value: openCount },
+          { label: '累計金額', value: 'NT$ ' + revenue }
+        ]);
+        html += '<div style="overflow-x:auto;"><table class="admin-table"><thead><tr>' +
           '<th>日期</th><th>商品</th><th>數量</th><th>金額</th><th>客戶</th><th>聯絡方式</th><th>狀態</th><th>操作</th></tr></thead><tbody>';
 
         html += orders.map(function(o) {
@@ -153,8 +208,8 @@ var BME_ADMIN = {
     var metalLabels = { rose_gold: '玫瑰金', warm_gold: '暖金色', silver: '銀色', black: '黑色' };
     var lengthLabels = { choker: '短鏈', medium: '中鏈', long: '長鏈', custom_length: '客製' };
     var typeLabels = { phone_strap: '手機鏈', earrings: '耳環', bracelet: '手鍊', necklace: '項鍊', keychain: '鑰匙圈', other: '其他' };
-    var statusLabels = { pending: '待處理', discussing: '討論中', confirmed: '已確認', in_production: '製作中', shipped: '已出貨', completed: '已完成', cancelled: '已取消' };
-    var statusColors = { pending: '#D4A574', discussing: '#8FB8C9', confirmed: '#0A1628', in_production: '#7BAE7F', shipped: '#7BAE7F', completed: '#0A1628', cancelled: '#C97B6B' };
+        var statusLabels = { pending: '待處理', discussing: '討論中', confirmed: '已確認', in_production: '製作中', shipped: '已出貨', completed: '已完成', cancelled: '已取消' };
+        var statusColors = { pending: '#D4A574', discussing: '#8FB8C9', confirmed: '#0A1628', in_production: '#7BAE7F', shipped: '#7BAE7F', completed: '#0A1628', cancelled: '#C97B6B' };
 
     initSupabase().then(function(client) {
       client.from('custom_orders').select('*').order('created_at', { ascending: false }).then(function(res) {
@@ -164,7 +219,19 @@ var BME_ADMIN = {
           return;
         }
 
-        var html = '<div style="overflow-x:auto;"><table class="admin-table"><thead><tr>' +
+        var pendingCount = orders.filter(function(o) { return o.status === 'pending'; }).length;
+        var discussingCount = orders.filter(function(o) { return o.status === 'discussing'; }).length;
+        var productionCount = orders.filter(function(o) { return o.status === 'in_production'; }).length;
+        var completedCount = orders.filter(function(o) { return o.status === 'completed'; }).length;
+        var html = '<div class="admin-toolbar"><div><h2 style="margin:0;font-size:18px;color:#0A1628;">客製化訂單</h2><p style="margin:4px 0 0;color:#777;font-size:13px;">追蹤客戶風格、材質與參考圖需求。</p></div></div>';
+        html += BME_ADMIN.renderStatCards([
+          { label: '客製總數', value: orders.length },
+          { label: '待處理', value: pendingCount },
+          { label: '討論中', value: discussingCount },
+          { label: '製作中', value: productionCount },
+          { label: '已完成', value: completedCount }
+        ]);
+        html += '<div style="overflow-x:auto;"><table class="admin-table"><thead><tr>' +
           '<th>日期</th><th>客戶</th><th>色系</th><th>金屬</th><th>長度</th><th>類型</th><th>參考圖</th><th>描述</th><th>狀態</th><th>操作</th></tr></thead><tbody>';
 
         html += orders.map(function(o) {
@@ -205,13 +272,39 @@ var BME_ADMIN = {
         var products = res.data || [];
         var statusLabels = { '上架': '上架', '下架': '下架', '已售出': '已售出', '試作中': '試作中', '即將上架': '即將上架' };
         var statusColors = { '上架': '#7BAE7F', '下架': '#999', '已售出': '#C97B6B', '試作中': '#D4A574', '即將上架': '#8FB8C9' };
+        var keyword = BME_ADMIN.getControlValue('admin-product-search');
+        var statusFilter = BME_ADMIN.getControlValue('admin-product-status');
+        var filtered = products.filter(function(p) {
+          var haystack = [p.sku, p.product_name, p.style, p.style_profile, p.description].join(' ');
+          var statusOk = !statusFilter || p.status === statusFilter;
+          return statusOk && BME_ADMIN.matchesText(haystack, keyword);
+        });
+        var activeCount = products.filter(function(p) { return p.status === '上架'; }).length;
+        var comingCount = products.filter(function(p) { return p.status === '即將上架' || p.status === '試作中'; }).length;
+        var soldCount = products.filter(function(p) { return p.is_sold || p.status === '已售出'; }).length;
 
         var html = '<div class="admin-toolbar">' +
           '<div>' +
             '<h2 style="margin:0;font-size:18px;color:#0A1628;">商品管理</h2>' +
-            '<p style="margin:4px 0 0;color:#777;font-size:13px;">可改價格、描述、圖片路徑與上架狀態。</p>' +
+            '<p style="margin:4px 0 0;color:#777;font-size:13px;">可改價格、描述、圖片路徑與上架狀態。建議先用搜尋找到 SKU，再進編輯。</p>' +
           '</div>' +
           '<button class="btn btn-primary" onclick="BME_ADMIN.showProductForm()" style="font-size:13px;padding:8px 16px;">＋ 新增商品</button>' +
+        '</div>';
+        html += BME_ADMIN.renderStatCards([
+          { label: '商品總數', value: products.length },
+          { label: '目前上架', value: activeCount },
+          { label: '準備中', value: comingCount },
+          { label: '已售出', value: soldCount }
+        ]);
+        html += '<div class="admin-controls">' +
+          '<label>搜尋商品 <input id="admin-product-search" class="admin-input" value="' + BME_ADMIN.escapeHtml(keyword) + '" placeholder="輸入 SKU、品名、風格"></label>' +
+          '<label>篩選狀態 <select id="admin-product-status" class="admin-input">' +
+            '<option value="">全部狀態</option>' +
+            Object.keys(statusLabels).map(function(k) {
+              return '<option value="' + k + '"' + (statusFilter === k ? ' selected' : '') + '>' + statusLabels[k] + '</option>';
+            }).join('') +
+          '</select></label>' +
+          '<button class="btn btn-secondary" onclick="BME_ADMIN.renderProducts()">套用</button>' +
         '</div>';
 
         if (products.length === 0) {
@@ -219,14 +312,19 @@ var BME_ADMIN = {
           container.innerHTML = html;
           return;
         }
+        if (filtered.length === 0) {
+          html += '<div class="empty-state"><p>找不到符合條件的商品。</p></div>';
+          container.innerHTML = html;
+          return;
+        }
 
         html += '<div style="overflow-x:auto;"><table class="admin-table"><thead><tr>' +
           '<th>圖片</th><th>SKU</th><th>商品名稱</th><th>價格</th><th>風格</th><th>描述</th><th>狀態</th><th>已售</th><th>操作</th></tr></thead><tbody>';
 
-        products.forEach(function(p) {
+        filtered.forEach(function(p) {
           var images = Array.isArray(p.images) ? p.images : [];
           var imgSrc = images[0] ? BME_ADMIN.imageSrc(images[0]) : '';
-          var imgHtml = imgSrc ? '<img src="' + BME_ADMIN.escapeHtml(imgSrc) + '" style="width:54px;height:54px;object-fit:cover;border-radius:6px;">' : '<div style="width:54px;height:54px;background:#E7E0DA;border-radius:6px;"></div>';
+          var imgHtml = imgSrc ? '<img src="' + BME_ADMIN.escapeHtml(imgSrc) + '" class="admin-thumb" alt="商品圖片">' : '<div class="admin-thumb-placeholder"></div>';
           var desc = p.description || '';
           var shortDesc = desc.length > 36 ? desc.substring(0, 36) + '…' : desc || '—';
 
@@ -250,6 +348,10 @@ var BME_ADMIN = {
 
         html += '</tbody></table></div>';
         container.innerHTML = html;
+        var search = document.getElementById('admin-product-search');
+        var filter = document.getElementById('admin-product-status');
+        if (search) search.onkeydown = function(e) { if (e.key === 'Enter') BME_ADMIN.renderProducts(); };
+        if (filter) filter.onchange = function() { BME_ADMIN.renderProducts(); };
       });
     });
   },
@@ -264,13 +366,39 @@ var BME_ADMIN = {
         var posts = res.data || [];
         var statusLabels = { draft: '草稿', published: '已發布', archived: '封存' };
         var statusColors = { draft: '#999', published: '#7BAE7F', archived: '#C97B6B' };
+        var keyword = BME_ADMIN.getControlValue('admin-post-search');
+        var statusFilter = BME_ADMIN.getControlValue('admin-post-status');
+        var filtered = posts.filter(function(post) {
+          var haystack = [post.slug, post.title, post.category, post.excerpt].join(' ');
+          var statusOk = !statusFilter || post.status === statusFilter;
+          return statusOk && BME_ADMIN.matchesText(haystack, keyword);
+        });
+        var publishedCount = posts.filter(function(post) { return post.status === 'published'; }).length;
+        var draftCount = posts.filter(function(post) { return post.status === 'draft' || !post.status; }).length;
+        var featuredCount = posts.filter(function(post) { return !!post.featured; }).length;
 
         var html = '<div class="admin-toolbar">' +
           '<div>' +
             '<h2 style="margin:0;font-size:18px;color:#0A1628;">網誌文章管理</h2>' +
-            '<p style="margin:4px 0 0;color:#777;font-size:13px;">管理誌頁的標題、摘要、封面與全文內容。</p>' +
+            '<p style="margin:4px 0 0;color:#777;font-size:13px;">管理誌頁的標題、摘要、封面與全文內容。草稿不會出現在前台。</p>' +
           '</div>' +
           '<button class="btn btn-primary" onclick="BME_ADMIN.showPostForm()" style="font-size:13px;padding:8px 16px;">＋ 新增文章</button>' +
+        '</div>';
+        html += BME_ADMIN.renderStatCards([
+          { label: '文章總數', value: posts.length },
+          { label: '已發布', value: publishedCount },
+          { label: '草稿', value: draftCount },
+          { label: '精選', value: featuredCount }
+        ]);
+        html += '<div class="admin-controls">' +
+          '<label>搜尋文章 <input id="admin-post-search" class="admin-input" value="' + BME_ADMIN.escapeHtml(keyword) + '" placeholder="輸入標題、slug、分類"></label>' +
+          '<label>篩選狀態 <select id="admin-post-status" class="admin-input">' +
+            '<option value="">全部狀態</option>' +
+            Object.keys(statusLabels).map(function(k) {
+              return '<option value="' + k + '"' + (statusFilter === k ? ' selected' : '') + '>' + statusLabels[k] + '</option>';
+            }).join('') +
+          '</select></label>' +
+          '<button class="btn btn-secondary" onclick="BME_ADMIN.renderPosts()">套用</button>' +
         '</div>';
 
         if (posts.length === 0) {
@@ -278,13 +406,18 @@ var BME_ADMIN = {
           container.innerHTML = html;
           return;
         }
+        if (filtered.length === 0) {
+          html += '<div class="empty-state"><p>找不到符合條件的文章。</p></div>';
+          container.innerHTML = html;
+          return;
+        }
 
         html += '<div style="overflow-x:auto;"><table class="admin-table"><thead><tr>' +
           '<th>封面</th><th>標題</th><th>分類</th><th>摘要</th><th>狀態</th><th>發布日</th><th>精選</th><th>操作</th></tr></thead><tbody>';
 
-        posts.forEach(function(post) {
+        filtered.forEach(function(post) {
           var cover = BME_ADMIN.imageSrc(post.cover_image, '../images/products/');
-          var coverHtml = cover ? '<img src="' + BME_ADMIN.escapeHtml(cover) + '" style="width:54px;height:54px;object-fit:cover;border-radius:6px;">' : '<div style="width:54px;height:54px;background:#E7E0DA;border-radius:6px;"></div>';
+          var coverHtml = cover ? '<img src="' + BME_ADMIN.escapeHtml(cover) + '" class="admin-thumb" alt="文章封面">' : '<div class="admin-thumb-placeholder"></div>';
           var excerpt = post.excerpt || '';
           var shortExcerpt = excerpt.length > 42 ? excerpt.substring(0, 42) + '…' : excerpt || '—';
 
@@ -307,6 +440,10 @@ var BME_ADMIN = {
 
         html += '</tbody></table></div>';
         container.innerHTML = html;
+        var search = document.getElementById('admin-post-search');
+        var filter = document.getElementById('admin-post-status');
+        if (search) search.onkeydown = function(e) { if (e.key === 'Enter') BME_ADMIN.renderPosts(); };
+        if (filter) filter.onchange = function() { BME_ADMIN.renderPosts(); };
       }).catch(function(err) {
         container.innerHTML = '<div class="empty-state"><p>文章資料表讀取失敗：' + BME_ADMIN.escapeHtml((err && err.message) ? err.message : '請先建立 journal_posts 資料表') + '</p></div>';
       });
@@ -354,6 +491,8 @@ var BME_ADMIN = {
               '<label>特色一句話 <input id="product-feature" class="admin-input" value="' + BME_ADMIN.escapeHtml(product.feature || '') + '" placeholder="一句話賣點"></label>' +
               '<label>描述 <textarea id="product-description" class="admin-input" rows="6" placeholder="商品詳細描述，每段可換行。">' + BME_ADMIN.escapeHtml(product.description || '') + '</textarea></label>' +
               '<label>圖片檔名或 URL（每行一個） <textarea id="product-images" class="admin-input" rows="3" placeholder="BM-T001_main.jpg\nBM-T001_hero.jpg">' + BME_ADMIN.escapeHtml(images) + '</textarea></label>' +
+              '<div class="admin-field-help">第一張是商品主圖，第二張建議放情境圖。可填檔名，也可貼完整 https 圖片網址。</div>' +
+              '<div id="product-image-preview" class="admin-image-preview"></div>' +
               '<label>標籤（逗號分隔） <input id="product-tags" class="admin-input" value="' + BME_ADMIN.escapeHtml(tags) + '" placeholder="手機鏈, 琉璃, 手作"></label>' +
               '<label>上架日期 <input id="product-date" class="admin-input" type="date" value="' + BME_ADMIN.escapeHtml(product.date_added || '') + '"></label>' +
               '<label>狀態 ' +
@@ -367,21 +506,27 @@ var BME_ADMIN = {
               '</label>' +
               '<label class="admin-check"><input id="product-is-sold" type="checkbox"' + (product.is_sold ? ' checked' : '') + '> 標記為已售出</label>' +
               '<div class="admin-form-actions">' +
-                '<button class="btn btn-primary" onclick="BME_ADMIN.saveProduct()">儲存</button>' +
+                '<button id="product-save-btn" class="btn btn-primary" onclick="BME_ADMIN.saveProduct()">儲存</button>' +
                 '<button class="btn btn-secondary" onclick="BME_ADMIN.renderProducts()">取消</button>' +
               '</div>' +
             '</div>' +
           '</div>';
+        BME_ADMIN.renderImagePreview('product-images', 'product-image-preview', '../images/products/');
+        var imageField = document.getElementById('product-images');
+        if (imageField) imageField.oninput = function() {
+          BME_ADMIN.renderImagePreview('product-images', 'product-image-preview', '../images/products/');
+        };
       });
     });
   },
 
   saveProduct: function() {
     var productId = document.getElementById('product-id').value.trim();
+    var priceValue = document.getElementById('product-price').value;
     var payload = {
       sku: document.getElementById('product-sku').value.trim(),
       product_name: document.getElementById('product-name').value.trim(),
-      price: parseInt(document.getElementById('product-price').value, 10) || 0,
+      price: parseInt(priceValue, 10),
       style: document.getElementById('product-style').value.trim(),
       style_profile: document.getElementById('product-style-profile').value,
       material: document.getElementById('product-material').value.trim(),
@@ -400,23 +545,33 @@ var BME_ADMIN = {
       return;
     }
 
-    if (!payload.price && payload.price !== 0) {
-      alert('請填寫價格');
+    if (isNaN(payload.price) || payload.price < 0) {
+      alert('請填寫正確價格');
       return;
     }
 
+    if (payload.images.length === 0) {
+      alert('請至少填一張商品圖片');
+      return;
+    }
+
+    this.setButtonBusy('product-save-btn', true, '儲存中…');
     initSupabase().then(function(client) {
       var request = productId
         ? client.from('products').update(payload).eq('id', productId)
         : client.from('products').insert(payload);
 
       request.then(function(res) {
+        BME_ADMIN.setButtonBusy('product-save-btn', false);
         if (res && res.error) {
           alert('儲存失敗：' + res.error.message);
           return;
         }
         alert('商品已儲存');
         BME_ADMIN.renderProducts();
+      }).catch(function(err) {
+        BME_ADMIN.setButtonBusy('product-save-btn', false);
+        alert('儲存失敗：' + ((err && err.message) ? err.message : '請稍後再試'));
       });
     });
   },
@@ -460,6 +615,8 @@ var BME_ADMIN = {
               '<label>分類 <input id="post-category" class="admin-input" value="' + BME_ADMIN.escapeHtml(post.category || '') + '" placeholder="選物筆記"></label>' +
               '<label>摘要 <textarea id="post-excerpt" class="admin-input" rows="3" placeholder="列表卡片顯示的短摘要。">' + BME_ADMIN.escapeHtml(post.excerpt || '') + '</textarea></label>' +
               '<label>封面圖片檔名或 URL <input id="post-cover" class="admin-input" value="' + BME_ADMIN.escapeHtml(post.cover_image || '') + '" placeholder="images/products/article-cover.jpg"></label>' +
+              '<div class="admin-field-help">封面會出現在誌頁文章卡。可填 images/products/xxx.jpg，或直接貼完整 https 圖片網址。</div>' +
+              '<div id="post-cover-preview" class="admin-image-preview"></div>' +
               '<label>發布日期 <input id="post-date" class="admin-input" type="date" value="' + BME_ADMIN.escapeHtml(post.published_at || '') + '"></label>' +
               '<label>排序 <input id="post-sort" class="admin-input" type="number" value="' + BME_ADMIN.escapeHtml(post.sort_order || 0) + '" placeholder="0"></label>' +
               '<label>狀態 ' +
@@ -472,11 +629,22 @@ var BME_ADMIN = {
               '<label class="admin-check"><input id="post-featured" type="checkbox"' + (post.featured ? ' checked' : '') + '> 設為精選</label>' +
               '<label>全文內容 <textarea id="post-content" class="admin-input" rows="10" placeholder="每段文字空一行，前台會自動拆段。">' + BME_ADMIN.escapeHtml(post.content || '') + '</textarea></label>' +
               '<div class="admin-form-actions">' +
-                '<button class="btn btn-primary" onclick="BME_ADMIN.savePost()">儲存</button>' +
+                '<button id="post-save-btn" class="btn btn-primary" onclick="BME_ADMIN.savePost()">儲存</button>' +
                 '<button class="btn btn-secondary" onclick="BME_ADMIN.renderPosts()">取消</button>' +
               '</div>' +
             '</div>' +
           '</div>';
+        var coverInput = document.getElementById('post-cover');
+        var syncCoverPreview = function() {
+          var preview = document.getElementById('post-cover-preview');
+          if (!preview) return;
+          var value = coverInput ? coverInput.value.trim() : '';
+          preview.innerHTML = value
+            ? '<figure class="admin-image-preview-item"><img src="' + BME_ADMIN.escapeHtml(BME_ADMIN.imageSrc(value, '../images/products/')) + '" alt="封面預覽" loading="lazy"><figcaption>' + BME_ADMIN.escapeHtml(value) + '</figcaption></figure>'
+            : '<div class="admin-image-empty">尚未填寫封面</div>';
+        };
+        syncCoverPreview();
+        if (coverInput) coverInput.oninput = syncCoverPreview;
       });
     });
   },
@@ -503,22 +671,32 @@ var BME_ADMIN = {
       return;
     }
 
+    if (!/^[a-z0-9-]+$/.test(payload.slug)) {
+      alert('Slug 只能使用小寫英文、數字與連字號，例如 style-guide-01');
+      return;
+    }
+
     if (!payload.excerpt && payload.content) {
       payload.excerpt = payload.content.replace(/\s+/g, ' ').trim().substring(0, 120);
     }
 
+    this.setButtonBusy('post-save-btn', true, '儲存中…');
     initSupabase().then(function(client) {
       var request = postId
         ? client.from('journal_posts').update(payload).eq('id', postId)
         : client.from('journal_posts').insert(payload);
 
       request.then(function(res) {
+        BME_ADMIN.setButtonBusy('post-save-btn', false);
         if (res && res.error) {
           alert('儲存失敗：' + res.error.message);
           return;
         }
         alert('文章已儲存');
         BME_ADMIN.renderPosts();
+      }).catch(function(err) {
+        BME_ADMIN.setButtonBusy('post-save-btn', false);
+        alert('儲存失敗：' + ((err && err.message) ? err.message : '請稍後再試'));
       });
     });
   },
