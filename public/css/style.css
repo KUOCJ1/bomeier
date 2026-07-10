@@ -2033,8 +2033,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .custom-style-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
 }
 
 .custom-style-option {
@@ -2051,7 +2051,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .custom-style-option .custom-option-image {
   position: relative;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 16 / 10;
+  min-height: 260px;
   overflow: hidden;
   background: #F5F2EE;
 }
@@ -2081,7 +2082,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .custom-option-copy {
-  padding: 14px 14px 16px;
+  padding: 18px 18px 20px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -2096,7 +2097,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .custom-style-option .custom-option-label {
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .custom-style-option .custom-option-desc {
@@ -2182,7 +2183,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .custom-summary-preview {
   display: grid;
-  grid-template-columns: 140px 1fr;
+  grid-template-columns: 180px 1fr;
   gap: 16px;
   align-items: center;
   margin-bottom: 16px;
@@ -2194,7 +2195,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .custom-summary-preview img {
   width: 100%;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: 10px;
   display: block;
@@ -2352,9 +2353,9 @@ h1, h2, h3, h4, h5, h6 {
   .custom-step-container {
     padding: 20px 16px;
   }
-  .custom-style-grid,
-  .style-guide-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+.custom-style-grid,
+.style-guide-grid {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
   .custom-summary-preview {
     grid-template-columns: 1fr;
@@ -2362,10 +2363,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 560px) {
-  .custom-style-grid,
-  .style-guide-grid {
-    grid-template-columns: 1fr;
-  }
+  .style-guide-grid { grid-template-columns: 1fr; }
 }
 
 /* ── Cart Panel Sidebar ── */
