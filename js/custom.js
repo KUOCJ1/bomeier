@@ -18,7 +18,8 @@ var BME_CUSTOM = {
       label: '浪漫復古',
       desc: '玫瑰金、粉嫩色系，適合送禮、約會與溫柔穿搭。',
       note: '柔和暖調',
-      image: 'images/custom-style/style-romantic-rose.jpg',
+      image: 'images/products/BM-T007_main.jpg',
+      productName: '櫻花雨',
       accent: '#D4A574'
     },
     {
@@ -26,7 +27,8 @@ var BME_CUSTOM = {
       label: '清透日常',
       desc: '透明琉璃、淺色系，乾淨百搭，最不挑手機殼。',
       note: '極簡通勤',
-      image: 'images/custom-style/style-clear-pastel.jpg',
+      image: 'images/products/BM-T001_main.jpg',
+      productName: '晨光序曲',
       accent: '#A8D8EA'
     },
     {
@@ -34,7 +36,8 @@ var BME_CUSTOM = {
       label: '霧藍瓷感',
       desc: '藍灰色調、安靜內斂，適合喜歡冷感質地的人。',
       note: '靜謐質感',
-      image: 'images/custom-style/style-porcelain-blue.jpg',
+      image: 'images/products/BM-T015_main.jpg',
+      productName: '海洋藍調',
       accent: '#8FB8C9'
     },
     {
@@ -42,7 +45,8 @@ var BME_CUSTOM = {
       label: '自然清新',
       desc: '大地色與植物感，放鬆、耐看、日常使用很舒服。',
       note: '自然系',
-      image: 'images/custom-style/style-sage-natural.jpg',
+      image: 'images/products/BM-T014_main.jpg',
+      productName: '森林物語',
       accent: '#7BAE7F'
     },
     {
@@ -50,7 +54,8 @@ var BME_CUSTOM = {
       label: '午夜精品',
       desc: '深色背景、金屬光澤，低調但有份量，夜色感明顯。',
       note: '高級夜色',
-      image: 'images/custom-style/style-midnight-luxury.jpg',
+      image: 'images/products/BM-T017_main.jpg',
+      productName: '星河漫夜',
       accent: '#0A1628'
     }
   ],
@@ -173,6 +178,7 @@ var BME_CUSTOM = {
           '<div class="custom-option-copy">' +
             '<div class="custom-option-kicker">Style Preview</div>' +
             '<div class="custom-option-label">' + card.label + '</div>' +
+            '<div class="custom-option-desc">代表款：' + card.productName + '</div>' +
             '<div class="custom-option-desc">' + card.desc + '</div>' +
           '</div>' +
           '<span class="selected-check">&#10003;</span>' +
