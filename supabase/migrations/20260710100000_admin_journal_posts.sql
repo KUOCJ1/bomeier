@@ -20,8 +20,14 @@ ALTER TABLE public.journal_posts ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Admin full access to journal posts"
   ON public.journal_posts FOR ALL
-  USING (auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin'))
-  WITH CHECK (auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin'));
+  USING (
+    auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin')
+    OR lower(coalesce(auth.jwt() ->> 'email', '')) = 'kuocj1@gmail.com'
+  )
+  WITH CHECK (
+    auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin')
+    OR lower(coalesce(auth.jwt() ->> 'email', '')) = 'kuocj1@gmail.com'
+  );
 
 CREATE POLICY "Anyone can view published journal posts"
   ON public.journal_posts FOR SELECT

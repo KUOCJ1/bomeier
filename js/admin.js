@@ -5,6 +5,7 @@ var BME_ADMIN = {
   adminEmail: null,
   productEditorId: null,
   postEditorId: null,
+  adminEmailAllowlist: ['kuocj1@gmail.com'],
 
   init: function() {
     var self = this;
@@ -16,7 +17,9 @@ var BME_ADMIN = {
 
       initSupabase().then(function(client) {
         client.from('profiles').select('role').eq('id', user.id).single().then(function(res) {
-          if (res && res.data && res.data.role === 'admin') {
+          var isAdmin = !!(res && res.data && res.data.role === 'admin');
+          var isAllowlisted = user && user.email && BME_ADMIN.adminEmailAllowlist.indexOf(user.email.toLowerCase()) >= 0;
+          if (isAdmin || isAllowlisted) {
             self.adminEmail = user.email;
             var loading = document.getElementById('admin-loading');
             var content = document.getElementById('admin-content');
