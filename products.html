@@ -1615,6 +1615,35 @@
         <button class="filter-btn" data-filter="midnight_luxury">午夜精品</button>
       </div>
 
+      <div class="product-controls" aria-label="商品搜尋與排序">
+        <label class="product-control product-control-search">
+          <span>搜尋商品</span>
+          <input id="product-search" type="search" placeholder="輸入品名、SKU、材質或風格">
+        </label>
+        <label class="product-control">
+          <span>商品類型</span>
+          <select id="product-type">
+            <option value="all">全部類型</option>
+            <option value="phone_strap">手機鏈</option>
+            <option value="earrings">耳環</option>
+            <option value="bracelet">手鍊</option>
+            <option value="necklace">項鍊／吊墜</option>
+            <option value="keychain">鑰匙圈／吊飾</option>
+            <option value="other">其他</option>
+          </select>
+        </label>
+        <label class="product-control">
+          <span>排序方式</span>
+          <select id="product-sort">
+            <option value="newest">最新上架</option>
+            <option value="price_asc">價格低到高</option>
+            <option value="price_desc">價格高到低</option>
+            <option value="name_asc">品名排序</option>
+          </select>
+        </label>
+        <div id="product-result-count" class="product-result-count">顯示商品中</div>
+      </div>
+
       <div class="product-grid" id="product-grid">
           <a class="product-card style-bg-romantic_rose" data-sku="BM-R001" href="product.html?sku=BM-R001">
             <div class="product-card-image">
@@ -1958,13 +1987,7 @@
       try {
         await BME.init();
         clearTimeout(_bmeTimeout);
-        var params = new URLSearchParams(window.location.search);
-        var filter = params.get("filter") || "all";
-        document.querySelectorAll(".filter-btn").forEach(function(btn) {
-          btn.classList.toggle("active", btn.dataset.filter === filter);
-        });
-        BME.currentFilter = filter;
-        BME.renderGrid("product-grid", filter);
+        BME.renderGrid("product-grid", BME.currentFilter);
       } catch (e) {
         clearTimeout(_bmeTimeout);
         console.error("Products init failed:", e);

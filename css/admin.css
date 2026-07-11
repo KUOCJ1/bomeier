@@ -268,6 +268,38 @@
   text-align: center;
   font-size: 13px;
 }
+
+.admin-upload-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-file-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px dashed #D5CDC4;
+  border-radius: 6px;
+  background: #FBF8F5;
+  box-sizing: border-box;
+  font-size: 13px;
+}
+
+.admin-file-input::file-selector-button {
+  margin-right: 10px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: #0A1628;
+  color: #fff;
+  font-family: "Noto Sans TC", sans-serif;
+  cursor: pointer;
+}
+
+.admin-file-input::file-selector-button:hover {
+  background: #1a2a48;
+}
 .admin-input {
   display: block;
   width: 100%;
@@ -366,6 +398,10 @@ textarea.admin-input {
 
   .admin-image-preview {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-upload-row {
+    grid-template-columns: 1fr;
   }
 
   .admin-main {

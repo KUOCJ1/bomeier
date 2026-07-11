@@ -6,6 +6,7 @@ var BME_ADMIN = {
   productEditorId: null,
   postEditorId: null,
   adminEmailAllowlist: ['kuocj1@gmail.com'],
+  storageBucket: 'product-images',
 
   init: function() {
     var self = this;
@@ -144,6 +145,73 @@ var BME_ADMIN = {
     if (!btn.dataset.originalText) btn.dataset.originalText = btn.textContent;
     btn.disabled = !!busy;
     btn.textContent = busy ? (label || '處理中…') : btn.dataset.originalText;
+  },
+
+  safeFileSegment: function(value) {
+    return String(value || 'product')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9._-]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '') || 'product';
+  },
+
+  appendTextareaLines: function(textareaId, lines) {
+    var field = document.getElementById(textareaId);
+    if (!field) return;
+    var current = this.parseList(field.value);
+    field.value = current.concat(lines).join('\n');
+  },
+
+  uploadProductImages: function(fileInputId, textareaId, previewId) {
+    var input = document.getElementById(fileInputId);
+    var files = input && input.files ? Array.prototype.slice.call(input.files) : [];
+    if (files.length === 0) {
+      alert('請先選擇要上傳的圖片');
+      return;
+    }
+
+    var skuField = document.getElementById('product-sku');
+    var sku = this.safeFileSegment(skuField ? skuField.value : 'product');
+    this.setButtonBusy('product-upload-btn', true, '上傳中…');
+
+    initSupabase().then(function(client) {
+      var uploaded = [];
+      var chain = files.reduce(function(promise, file) {
+        return promise.then(function() {
+          if (!/^image\//.test(file.type)) {
+            throw new Error('只能上傳圖片檔：' + file.name);
+          }
+          var ext = file.name.indexOf('.') >= 0 ? file.name.split('.').pop() : 'jpg';
+          var name = Date.now() + '-' + BME_ADMIN.safeFileSegment(file.name.replace(/\.[^.]+$/, '')) + '.' + BME_ADMIN.safeFileSegment(ext);
+          var path = 'products/' + sku + '/' + name;
+          return client.storage
+            .from(BME_ADMIN.storageBucket)
+            .upload(path, file, { cacheControl: '3600', upsert: true })
+            .then(function(res) {
+              if (res && res.error) throw res.error;
+              var publicRes = client.storage.from(BME_ADMIN.storageBucket).getPublicUrl(path);
+              if (publicRes && publicRes.data && publicRes.data.publicUrl) {
+                uploaded.push(publicRes.data.publicUrl);
+              }
+            });
+        });
+      }, Promise.resolve());
+
+      chain.then(function() {
+        BME_ADMIN.setButtonBusy('product-upload-btn', false);
+        BME_ADMIN.appendTextareaLines(textareaId, uploaded);
+        BME_ADMIN.renderImagePreview(textareaId, previewId, '../images/products/');
+        input.value = '';
+        alert('已上傳 ' + uploaded.length + ' 張圖片，並加入圖片清單');
+      }).catch(function(err) {
+        BME_ADMIN.setButtonBusy('product-upload-btn', false);
+        alert('圖片上傳失敗：' + ((err && err.message) ? err.message : '請確認 Supabase Storage bucket 已建立'));
+      });
+    }).catch(function(err) {
+      BME_ADMIN.setButtonBusy('product-upload-btn', false);
+      alert('圖片上傳失敗：' + ((err && err.message) ? err.message : '請稍後再試'));
+    });
   },
 
   renderOrders: function() {
@@ -491,7 +559,11 @@ var BME_ADMIN = {
               '<label>特色一句話 <input id="product-feature" class="admin-input" value="' + BME_ADMIN.escapeHtml(product.feature || '') + '" placeholder="一句話賣點"></label>' +
               '<label>描述 <textarea id="product-description" class="admin-input" rows="6" placeholder="商品詳細描述，每段可換行。">' + BME_ADMIN.escapeHtml(product.description || '') + '</textarea></label>' +
               '<label>圖片檔名或 URL（每行一個） <textarea id="product-images" class="admin-input" rows="3" placeholder="BM-T001_main.jpg\nBM-T001_hero.jpg">' + BME_ADMIN.escapeHtml(images) + '</textarea></label>' +
-              '<div class="admin-field-help">第一張是商品主圖，第二張建議放情境圖。可填檔名，也可貼完整 https 圖片網址。</div>' +
+              '<div class="admin-upload-row">' +
+                '<input id="product-image-upload" class="admin-file-input" type="file" accept="image/*" multiple>' +
+                '<button id="product-upload-btn" type="button" class="btn btn-secondary" onclick="BME_ADMIN.uploadProductImages(\'product-image-upload\', \'product-images\', \'product-image-preview\')">上傳圖片並加入清單</button>' +
+              '</div>' +
+              '<div class="admin-field-help">第一張是商品主圖，第二張建議放情境圖。可填檔名、貼完整 https 圖片網址，也可以直接選檔上傳。</div>' +
               '<div id="product-image-preview" class="admin-image-preview"></div>' +
               '<label>標籤（逗號分隔） <input id="product-tags" class="admin-input" value="' + BME_ADMIN.escapeHtml(tags) + '" placeholder="手機鏈, 琉璃, 手作"></label>' +
               '<label>上架日期 <input id="product-date" class="admin-input" type="date" value="' + BME_ADMIN.escapeHtml(product.date_added || '') + '"></label>' +
