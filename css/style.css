@@ -2915,6 +2915,134 @@ h1, h2, h3, h4, h5, h6 {
   .style-guide-grid { grid-template-columns: 1fr; }
 }
 
+/* === Soft Atelier content polish === */
+.about-atelier-hero {
+  min-height: auto;
+  padding: 132px 24px 76px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.72), rgba(251,247,242,0.86)),
+    url("../images/products/about_curation.webp") center/cover;
+}
+
+.about-atelier-hero::before {
+  background: rgba(255,255,255,0.62);
+  backdrop-filter: blur(1px);
+}
+
+.about-atelier-hero h1 {
+  color: var(--atelier-ink) !important;
+  font-family: var(--atelier-display);
+  font-weight: 500;
+}
+
+.about-atelier-hero .subtitle {
+  max-width: 620px;
+  margin: 0 auto;
+  color: var(--atelier-taupe) !important;
+  letter-spacing: 0.04em !important;
+}
+
+.about-atelier {
+  max-width: 920px;
+  margin: 0 auto 92px;
+  padding: 64px 24px 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  position: relative;
+  z-index: 2;
+}
+
+.about-atelier > p:first-child,
+.about-atelier > p:nth-child(2),
+.about-atelier > p:nth-child(3) {
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 18px;
+  color: var(--atelier-ink);
+}
+
+.about-values .value-card {
+  border: 1px solid var(--atelier-line);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.72);
+  box-shadow: var(--atelier-shadow-soft);
+}
+
+.brand-timeline {
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.journal-grid {
+  margin-top: 34px;
+}
+
+.journal-card {
+  border: 1px solid var(--atelier-line);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.84);
+  box-shadow: var(--atelier-shadow-soft);
+}
+
+.journal-card.clickable:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--atelier-shadow-lift);
+}
+
+.journal-card-image {
+  aspect-ratio: 4 / 3;
+  background: var(--atelier-porcelain);
+}
+
+.journal-card-image img {
+  transition: transform 0.7s ease;
+}
+
+.journal-card.clickable:hover .journal-card-image img {
+  transform: scale(1.045);
+}
+
+.journal-card-body {
+  min-height: 210px;
+}
+
+.journal-card h3 {
+  font-family: var(--atelier-serif);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--atelier-ink);
+}
+
+.journal-article-content {
+  border: 1px solid var(--atelier-line);
+  border-radius: 8px;
+  box-shadow: var(--atelier-shadow-soft);
+}
+
+@media (max-width: 768px) {
+  .about-atelier-hero {
+    padding: 112px 20px 58px;
+  }
+
+  .about-atelier {
+    padding: 42px 18px 0;
+    margin-bottom: 60px;
+  }
+
+  .about-atelier > p:first-child,
+  .about-atelier > p:nth-child(2),
+  .about-atelier > p:nth-child(3) {
+    font-size: 16px;
+  }
+
+  .journal-card-body {
+    min-height: auto;
+  }
+}
+
 /* ── Cart Panel Sidebar ── */
 .cart-panel {
   position: fixed;
