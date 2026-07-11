@@ -68,6 +68,20 @@
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.5s ease;
+
+  /* Soft Atelier refinement */
+  --atelier-paper: #FBF8F4;
+  --atelier-porcelain: #F3ECE4;
+  --atelier-ink: #1F1915;
+  --atelier-taupe: #7A6A5E;
+  --atelier-line: rgba(31, 25, 21, 0.10);
+  --atelier-rose: #C9956B;
+  --atelier-deep: #171310;
+  --atelier-shadow-soft: 0 18px 50px rgba(31, 25, 21, 0.08);
+  --atelier-shadow-lift: 0 24px 70px rgba(31, 25, 21, 0.12);
+  --atelier-serif: "Noto Serif TC", "Songti TC", serif;
+  --atelier-sans: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  --atelier-display: "Playfair Display", "Georgia", serif;
 }
 
 /* --- Reset --- */
@@ -83,12 +97,13 @@ html {
 }
 
 body {
-  font-family: var(--font-cn);
+  font-family: var(--atelier-sans);
   font-size: var(--text-body);
   line-height: var(--line-height-loose);
-  color: var(--color-ink);
-  background-color: var(--color-cream);
+  color: var(--atelier-ink);
+  background-color: var(--atelier-paper);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 img {
@@ -111,10 +126,11 @@ ul { list-style: none; }
 
 /* --- Typography --- */
 h1, h2, h3, h4 {
-  font-family: var(--font-cn);
-  font-weight: 700;
+  font-family: var(--atelier-serif);
+  font-weight: 600;
   line-height: var(--line-height-tight);
-  color: var(--color-ink);
+  color: var(--atelier-ink);
+  letter-spacing: 0;
 }
 
 h1 { font-size: var(--text-h1); }
@@ -146,12 +162,13 @@ h4 { font-size: var(--text-h4); }
   display: flex;
   align-items: center;
   padding: 0 var(--space-4);
-  transition: background var(--transition-normal), box-shadow var(--transition-normal);
+  backdrop-filter: blur(14px);
+  transition: background var(--transition-normal), box-shadow var(--transition-normal), height var(--transition-normal);
 }
 
 .nav.scrolled {
-  background: var(--color-white);
-  box-shadow: var(--shadow-nav);
+  background: rgba(251, 248, 244, 0.92);
+  box-shadow: 0 1px 0 var(--atelier-line);
 }
 
 .nav-inner {
@@ -164,7 +181,7 @@ h4 { font-size: var(--text-h4); }
 }
 
 .nav-logo {
-  font-family: var(--font-en-display);
+  font-family: var(--atelier-display);
   font-size: 22px;
   font-weight: 700;
   color: var(--color-ink);
@@ -187,7 +204,7 @@ h4 { font-size: var(--text-h4); }
 .nav-links a {
   font-size: var(--text-small);
   font-weight: 500;
-  color: var(--color-ink);
+  color: var(--atelier-ink);
   font-family: var(--font-cn);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -341,6 +358,53 @@ h4 { font-size: var(--text-h4); }
   background: rgba(201,149,107,0.06);
   color: #B8805A;
   border-color: #B8805A;
+}
+
+/* ========================================
+   SOFT ATELIER — Global refinement layer
+   ======================================== */
+
+.section-alt {
+  background: linear-gradient(180deg, var(--atelier-paper), var(--atelier-porcelain));
+}
+
+.section-header h2 {
+  font-family: var(--atelier-serif);
+  font-weight: 600;
+  color: var(--atelier-ink);
+}
+
+.section-subtitle {
+  color: var(--atelier-taupe);
+  letter-spacing: 0.12em;
+}
+
+.btn {
+  font-family: var(--atelier-sans);
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+.btn-primary {
+  background: var(--atelier-deep);
+  color: #FFFFFF;
+}
+
+.btn-primary:hover {
+  background: var(--atelier-rose);
+  color: #FFFFFF;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.56);
+  color: var(--atelier-ink);
+  border: 1.5px solid var(--atelier-line);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--atelier-rose);
+  border-color: var(--atelier-rose);
 }
 
 /*
@@ -1433,15 +1497,26 @@ h4 { font-size: var(--text-h4); }
 }
 
 /* --- Scroll Animation 增強 --- */
+.atelier-reveal,
 .fade-in {
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transform: translateY(16px);
+  transition: opacity 900ms ease, transform 900ms ease;
 }
 
+.atelier-reveal.visible,
 .fade-in.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* --- Footer 強化 --- */

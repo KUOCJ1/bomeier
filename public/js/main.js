@@ -27,18 +27,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- Scroll fade-in animations ---
-  const fadeEls = document.querySelectorAll('.fade-in');
+  const fadeEls = document.querySelectorAll('.fade-in, .atelier-reveal');
   if (fadeEls.length) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      fadeEls.forEach(el => el.classList.add('visible'));
+    } else {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
 
-    fadeEls.forEach(el => observer.observe(el));
+      fadeEls.forEach(el => observer.observe(el));
+    }
   }
 
   // --- Active nav link ---
