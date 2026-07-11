@@ -7,6 +7,12 @@ var BME_ADMIN = {
   postEditorId: null,
   adminEmailAllowlist: ['kuocj1@gmail.com'],
   storageBucket: 'product-images',
+  customOptionGroups: {
+    style: '風格情境',
+    metal: '金屬材質',
+    length: '鏈長規格',
+    type: '商品種類'
+  },
 
   init: function() {
     var self = this;
@@ -55,6 +61,7 @@ var BME_ADMIN = {
 
     if (page === 'orders') this.renderOrders();
     else if (page === 'custom') this.renderCustomOrders();
+    else if (page === 'custom-options') this.renderCustomOptions();
     else if (page === 'products') this.renderProducts();
     else if (page === 'posts') this.renderPosts();
   },
@@ -782,6 +789,284 @@ var BME_ADMIN = {
           return;
         }
         BME_ADMIN.renderPosts();
+      });
+    });
+  },
+
+  getCustomOptionGroupLabel: function(group) {
+    return this.customOptionGroups[group] || group || '未分類';
+  },
+
+  renderCustomOptions: function() {
+    var container = document.getElementById('admin-panel-content');
+    if (!container) return;
+    container.innerHTML = '<div class="skeleton-loading" style="padding:40px;text-align:center;">載入客製選項…</div>';
+
+    initSupabase().then(function(client) {
+      Promise.all([
+        client.from('custom_options').select('*').order('option_group', { ascending: true }).order('sort_order', { ascending: true }),
+        client.from('custom_page_settings').select('*').eq('key', 'custom_page').single()
+      ]).then(function(results) {
+        var optionsRes = results[0] || {};
+        var settingsRes = results[1] || {};
+        if (optionsRes.error) {
+          container.innerHTML = '<div class="empty-state"><p>客製選項資料表讀取失敗：' + BME_ADMIN.escapeHtml(optionsRes.error.message) + '</p></div>';
+          return;
+        }
+        var options = optionsRes.data || [];
+        var settings = settingsRes.data && settingsRes.data.value ? settingsRes.data.value : {};
+        var activeCount = options.filter(function(option) { return option.is_active; }).length;
+        var styleCount = options.filter(function(option) { return option.option_group === 'style'; }).length;
+
+        var html = '<div class="admin-toolbar">' +
+          '<div>' +
+            '<h2 style="margin:0;font-size:18px;color:#0A1628;">客製選項管理</h2>' +
+            '<p style="margin:4px 0 0;color:#777;font-size:13px;">這裡會直接影響前台客製頁的風格、材質、長度、種類與引導文案。</p>' +
+          '</div>' +
+          '<button class="btn btn-primary" onclick="BME_ADMIN.showCustomOptionForm()" style="font-size:13px;padding:8px 16px;">＋ 新增選項</button>' +
+        '</div>';
+        html += BME_ADMIN.renderStatCards([
+          { label: '選項總數', value: options.length },
+          { label: '啟用中', value: activeCount },
+          { label: '風格情境', value: styleCount },
+          { label: '規格群組', value: Object.keys(BME_ADMIN.customOptionGroups).length }
+        ]);
+        html += BME_ADMIN.renderCustomSettingsForm(settings);
+        html += BME_ADMIN.renderCustomOptionsTable(options);
+        container.innerHTML = html;
+      }).catch(function(err) {
+        container.innerHTML = '<div class="empty-state"><p>客製選項讀取失敗：' + BME_ADMIN.escapeHtml((err && err.message) ? err.message : '請確認資料表已建立') + '</p></div>';
+      });
+    });
+  },
+
+  renderCustomSettingsForm: function(settings) {
+    settings = settings || {};
+    return '<section class="admin-settings-card">' +
+      '<div class="admin-section-title">' +
+        '<div><h3>客製頁文案</h3><p>調整前台客製頁標題、提示與送出後訊息。</p></div>' +
+      '</div>' +
+      '<div class="admin-option-grid">' +
+        '<label>頁面標題 <input id="custom-setting-hero-title" class="admin-input" value="' + this.escapeHtml(settings.heroTitle || '') + '" placeholder="打造你的夢想飾品"></label>' +
+        '<label>頁面說明 <textarea id="custom-setting-hero-subtitle" class="admin-input" rows="3" placeholder="選風格、選材質、補需求...">' + this.escapeHtml(settings.heroSubtitle || '') + '</textarea></label>' +
+        '<label>參考圖提示 <textarea id="custom-setting-reference-help" class="admin-input" rows="2" placeholder="上傳風格照、手機殼照...">' + this.escapeHtml(settings.referenceHelp || '') + '</textarea></label>' +
+        '<label>需求欄位提示 <textarea id="custom-setting-description-placeholder" class="admin-input" rows="3" placeholder="例如：想要更淡一點...">' + this.escapeHtml(settings.descriptionPlaceholder || '') + '</textarea></label>' +
+        '<label>送出按鈕文字 <input id="custom-setting-submit-label" class="admin-input" value="' + this.escapeHtml(settings.submitLabel || '') + '" placeholder="送出客製想法"></label>' +
+        '<label>成功標題 <input id="custom-setting-success-title" class="admin-input" value="' + this.escapeHtml(settings.successTitle || '') + '" placeholder="客製想法已送出"></label>' +
+        '<label>成功訊息 <textarea id="custom-setting-success-body" class="admin-input" rows="2" placeholder="我們會在 1-2 個工作天內聯繫你。">' + this.escapeHtml(settings.successBody || '') + '</textarea></label>' +
+      '</div>' +
+      '<div class="admin-form-actions">' +
+        '<button id="custom-settings-save-btn" class="btn btn-primary" onclick="BME_ADMIN.saveCustomPageSettings()">儲存頁面文案</button>' +
+      '</div>' +
+    '</section>';
+  },
+
+  renderCustomOptionsTable: function(options) {
+    var grouped = {};
+    Object.keys(this.customOptionGroups).forEach(function(group) { grouped[group] = []; });
+    (options || []).forEach(function(option) {
+      if (!grouped[option.option_group]) grouped[option.option_group] = [];
+      grouped[option.option_group].push(option);
+    });
+
+    var html = '<section class="admin-settings-card">' +
+      '<div class="admin-section-title"><div><h3>選項列表</h3><p>風格選項會在前台顯示情境圖與三個理解欄位；停用後前台不會出現。</p></div></div>';
+
+    Object.keys(grouped).forEach(function(group) {
+      var items = grouped[group];
+      html += '<div class="admin-option-group">' +
+        '<h4>' + BME_ADMIN.escapeHtml(BME_ADMIN.getCustomOptionGroupLabel(group)) + '</h4>';
+      if (items.length === 0) {
+        html += '<p class="admin-muted">尚未建立選項。</p>';
+      } else {
+        html += '<div style="overflow-x:auto;"><table class="admin-table admin-option-table"><thead><tr>' +
+          '<th>排序</th><th>名稱</th><th>代碼</th><th>情境圖 / 標記</th><th>描述</th><th>狀態</th><th>操作</th>' +
+        '</tr></thead><tbody>';
+        items.forEach(function(option) {
+          var meta = option.metadata || {};
+          var image = option.image_url ? BME_ADMIN.imageSrc(option.image_url, '../') : '';
+          var visual = image
+            ? '<img src="' + BME_ADMIN.escapeHtml(image) + '" class="admin-thumb" alt="選項圖片">'
+            : '<span class="admin-option-token">' + BME_ADMIN.escapeHtml(meta.emoji || meta.feel || '—') + '</span>';
+          html += '<tr>' +
+            '<td>' + BME_ADMIN.escapeHtml(option.sort_order || 0) + '</td>' +
+            '<td>' + BME_ADMIN.escapeHtml(option.label || '—') + '</td>' +
+            '<td style="font-family:monospace;font-size:12px;">' + BME_ADMIN.escapeHtml(option.code || '—') + '</td>' +
+            '<td>' + visual + '</td>' +
+            '<td style="max-width:320px;">' + BME_ADMIN.escapeHtml(option.description || '—') + '</td>' +
+            '<td><label class="admin-check"><input type="checkbox" ' + (option.is_active ? 'checked' : '') + ' onchange="BME_ADMIN.toggleCustomOptionActive(\'' + option.id + '\', this.checked)"> 啟用</label></td>' +
+            '<td><button class="admin-link-btn" onclick="BME_ADMIN.showCustomOptionForm(\'' + option.id + '\')">編輯</button></td>' +
+          '</tr>';
+        });
+        html += '</tbody></table></div>';
+      }
+      html += '</div>';
+    });
+
+    html += '</section>';
+    return html;
+  },
+
+  showCustomOptionForm: function(optionId) {
+    var container = document.getElementById('admin-panel-content');
+    var isEdit = !!optionId;
+    initSupabase().then(function(client) {
+      var load = isEdit ? client.from('custom_options').select('*').eq('id', optionId).single() : Promise.resolve({ data: null });
+      load.then(function(res) {
+        if (res && res.error) {
+          alert('讀取選項失敗：' + res.error.message);
+          return;
+        }
+        var option = res.data || { option_group: 'style', sort_order: 0, is_active: true, metadata: {} };
+        var meta = option.metadata || {};
+        container.innerHTML =
+          '<div class="admin-form-shell">' +
+            '<div class="admin-toolbar" style="margin-bottom:16px;">' +
+              '<div>' +
+                '<h2 style="margin:0;font-size:18px;color:#0A1628;">' + (isEdit ? '編輯客製選項' : '新增客製選項') + '</h2>' +
+                '<p style="margin:4px 0 0;color:#777;font-size:13px;">風格選項建議填完整情境圖、場景、穿搭與一眼感受；規格選項可只填名稱與描述。</p>' +
+              '</div>' +
+              '<button class="btn btn-secondary" onclick="BME_ADMIN.renderCustomOptions()">返回列表</button>' +
+            '</div>' +
+            '<div class="admin-form">' +
+              '<input type="hidden" id="custom-option-id" value="' + BME_ADMIN.escapeHtml(option.id || '') + '">' +
+              '<label>群組 <select id="custom-option-group" class="admin-input">' +
+                Object.keys(BME_ADMIN.customOptionGroups).map(function(group) {
+                  return '<option value="' + group + '"' + (option.option_group === group ? ' selected' : '') + '>' + BME_ADMIN.escapeHtml(BME_ADMIN.customOptionGroups[group]) + '</option>';
+                }).join('') +
+              '</select></label>' +
+              '<label>代碼 <input id="custom-option-code" class="admin-input" value="' + BME_ADMIN.escapeHtml(option.code || '') + '" placeholder="例如：soft_pearl"></label>' +
+              '<div class="admin-field-help">代碼會寫入訂單，建議用小寫英文、數字與底線，建立後不要任意更名。</div>' +
+              '<label>顯示名稱 <input id="custom-option-label" class="admin-input" value="' + BME_ADMIN.escapeHtml(option.label || '') + '" placeholder="例如：珍珠微光"></label>' +
+              '<label>描述 <textarea id="custom-option-description" class="admin-input" rows="3" placeholder="前台選項卡上的短描述。">' + BME_ADMIN.escapeHtml(option.description || '') + '</textarea></label>' +
+              '<label>圖片檔名或 URL <input id="custom-option-image" class="admin-input" value="' + BME_ADMIN.escapeHtml(option.image_url || '') + '" placeholder="images/products/BM-T001_main.jpg"></label>' +
+              '<div class="admin-field-help">風格情境圖建議用同角度、同光線，只換商品與氛圍。可填 images/products/xxx.jpg 或完整 https 圖片網址。</div>' +
+              '<div id="custom-option-image-preview" class="admin-image-preview"></div>' +
+              '<div class="admin-option-grid">' +
+                '<label>適合場景 <input id="custom-option-scene" class="admin-input" value="' + BME_ADMIN.escapeHtml(meta.scene || '') + '" placeholder="通勤 / 約會 / 送禮"></label>' +
+                '<label>適合穿搭 <input id="custom-option-wear" class="admin-input" value="' + BME_ADMIN.escapeHtml(meta.wear || '') + '" placeholder="白襯衫、針織、洋裝"></label>' +
+                '<label>一眼感受 <input id="custom-option-feel" class="admin-input" value="' + BME_ADMIN.escapeHtml(meta.feel || '') + '" placeholder="柔和暖調"></label>' +
+                '<label>代表商品名 <input id="custom-option-product-name" class="admin-input" value="' + BME_ADMIN.escapeHtml(meta.productName || '') + '" placeholder="晨光序曲"></label>' +
+                '<label>色彩標籤 <input id="custom-option-color-label" class="admin-input" value="' + BME_ADMIN.escapeHtml(meta.colorLabel || '') + '" placeholder="透明、淺色系"></label>' +
+                '<label>小標記 <input id="custom-option-emoji" class="admin-input" value="' + BME_ADMIN.escapeHtml(meta.emoji || '') + '" placeholder="手機 / 45 / ✦"></label>' +
+                '<label>強調色 <input id="custom-option-accent" class="admin-input" value="' + BME_ADMIN.escapeHtml(meta.accent || '') + '" placeholder="#C9956B"></label>' +
+                '<label>排序 <input id="custom-option-sort" class="admin-input" type="number" value="' + BME_ADMIN.escapeHtml(option.sort_order || 0) + '"></label>' +
+              '</div>' +
+              '<label class="admin-check"><input id="custom-option-active" type="checkbox"' + (option.is_active !== false ? ' checked' : '') + '> 啟用這個選項</label>' +
+              '<div class="admin-form-actions">' +
+                '<button id="custom-option-save-btn" class="btn btn-primary" onclick="BME_ADMIN.saveCustomOption()">儲存選項</button>' +
+                '<button class="btn btn-secondary" onclick="BME_ADMIN.renderCustomOptions()">取消</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        var imageInput = document.getElementById('custom-option-image');
+        var syncPreview = function() {
+          var preview = document.getElementById('custom-option-image-preview');
+          if (!preview) return;
+          var value = imageInput ? imageInput.value.trim() : '';
+          preview.innerHTML = value
+            ? '<figure class="admin-image-preview-item"><img src="' + BME_ADMIN.escapeHtml(BME_ADMIN.imageSrc(value, '../')) + '" alt="選項圖片預覽" loading="lazy"><figcaption>' + BME_ADMIN.escapeHtml(value) + '</figcaption></figure>'
+            : '<div class="admin-image-empty">尚未填寫圖片</div>';
+        };
+        syncPreview();
+        if (imageInput) imageInput.oninput = syncPreview;
+      });
+    });
+  },
+
+  saveCustomOption: function() {
+    var optionId = document.getElementById('custom-option-id').value.trim();
+    var code = document.getElementById('custom-option-code').value.trim();
+    var label = document.getElementById('custom-option-label').value.trim();
+    if (!code || !label) {
+      alert('請填寫代碼與顯示名稱');
+      return;
+    }
+    if (!/^[a-z0-9_]+$/.test(code)) {
+      alert('代碼只能使用小寫英文、數字與底線，例如 soft_pearl');
+      return;
+    }
+
+    var metadata = {
+      scene: document.getElementById('custom-option-scene').value.trim(),
+      wear: document.getElementById('custom-option-wear').value.trim(),
+      feel: document.getElementById('custom-option-feel').value.trim(),
+      productName: document.getElementById('custom-option-product-name').value.trim(),
+      colorLabel: document.getElementById('custom-option-color-label').value.trim(),
+      emoji: document.getElementById('custom-option-emoji').value.trim(),
+      accent: document.getElementById('custom-option-accent').value.trim()
+    };
+
+    var payload = {
+      option_group: document.getElementById('custom-option-group').value,
+      code: code,
+      label: label,
+      description: document.getElementById('custom-option-description').value.trim(),
+      image_url: document.getElementById('custom-option-image').value.trim(),
+      metadata: metadata,
+      sort_order: parseInt(document.getElementById('custom-option-sort').value, 10) || 0,
+      is_active: document.getElementById('custom-option-active').checked,
+      updated_at: new Date().toISOString()
+    };
+
+    this.setButtonBusy('custom-option-save-btn', true, '儲存中…');
+    initSupabase().then(function(client) {
+      var request = optionId
+        ? client.from('custom_options').update(payload).eq('id', optionId)
+        : client.from('custom_options').insert(payload);
+      request.then(function(res) {
+        BME_ADMIN.setButtonBusy('custom-option-save-btn', false);
+        if (res && res.error) {
+          alert('儲存失敗：' + res.error.message);
+          return;
+        }
+        alert('客製選項已儲存');
+        BME_ADMIN.renderCustomOptions();
+      }).catch(function(err) {
+        BME_ADMIN.setButtonBusy('custom-option-save-btn', false);
+        alert('儲存失敗：' + ((err && err.message) ? err.message : '請稍後再試'));
+      });
+    });
+  },
+
+  saveCustomPageSettings: function() {
+    var value = {
+      heroTitle: document.getElementById('custom-setting-hero-title').value.trim(),
+      heroSubtitle: document.getElementById('custom-setting-hero-subtitle').value.trim(),
+      referenceHelp: document.getElementById('custom-setting-reference-help').value.trim(),
+      descriptionPlaceholder: document.getElementById('custom-setting-description-placeholder').value.trim(),
+      submitLabel: document.getElementById('custom-setting-submit-label').value.trim(),
+      successTitle: document.getElementById('custom-setting-success-title').value.trim(),
+      successBody: document.getElementById('custom-setting-success-body').value.trim()
+    };
+
+    this.setButtonBusy('custom-settings-save-btn', true, '儲存中…');
+    initSupabase().then(function(client) {
+      client.from('custom_page_settings')
+        .upsert({ key: 'custom_page', value: value, updated_at: new Date().toISOString() })
+        .then(function(res) {
+          BME_ADMIN.setButtonBusy('custom-settings-save-btn', false);
+          if (res && res.error) {
+            alert('儲存失敗：' + res.error.message);
+            return;
+          }
+          alert('客製頁文案已儲存');
+          BME_ADMIN.renderCustomOptions();
+        }).catch(function(err) {
+          BME_ADMIN.setButtonBusy('custom-settings-save-btn', false);
+          alert('儲存失敗：' + ((err && err.message) ? err.message : '請稍後再試'));
+        });
+    });
+  },
+
+  toggleCustomOptionActive: function(optionId, active) {
+    initSupabase().then(function(client) {
+      client.from('custom_options').update({ is_active: active, updated_at: new Date().toISOString() }).eq('id', optionId).then(function(res) {
+        if (res && res.error) {
+          alert('更新失敗：' + res.error.message);
+          return;
+        }
+        BME_ADMIN.renderCustomOptions();
       });
     });
   },
