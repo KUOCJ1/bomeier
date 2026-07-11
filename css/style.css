@@ -3589,6 +3589,61 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
 }
 
+/* --- 商品詳情頁：圖片與文字比例平衡 --- */
+.atelier-product-detail .product-detail-inner {
+  max-width: 1120px;
+  grid-template-columns: minmax(280px, 430px) minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 56px);
+}
 
+.atelier-product-detail .product-images {
+  width: 100%;
+  max-width: 430px;
+}
+
+.atelier-product-detail .product-main-image {
+  aspect-ratio: 4 / 5;
+}
+
+.atelier-product-detail .product-main-image img {
+  object-fit: contain;
+  background: var(--atelier-porcelain);
+}
+
+.atelier-product-detail .product-info {
+  min-width: 0;
+  max-width: 600px;
+}
+
+@media (max-width: 920px) {
+  .atelier-product-detail .product-detail-inner {
+    grid-template-columns: minmax(240px, 360px) minmax(0, 1fr);
+    gap: 28px;
+  }
+}
+
+@media (max-width: 760px) {
+  .atelier-product-detail .product-detail-inner {
+    display: block;
+    padding: 10px;
+  }
+
+  .atelier-product-detail .product-images {
+    max-width: 324px;
+    margin: 0 auto 28px;
+  }
+
+  .atelier-product-detail .product-main-image {
+    width: 100%;
+    margin-left: 0;
+    transform: none;
+    border-radius: 8px;
+    aspect-ratio: 4 / 5;
+  }
+
+  .atelier-product-detail .product-info {
+    max-width: none;
+  }
+}
 
 
