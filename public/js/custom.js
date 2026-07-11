@@ -29,11 +29,11 @@ var BME_CUSTOM = {
     },
     options: {
       style: [
-        { value: 'romantic_rose', label: '浪漫復古', desc: '玫瑰金與粉色珠串，偏送禮與約會感。', scene: '送禮 / 約會 / 柔和穿搭', wear: '奶茶色、白色、針織、洋裝', feel: '柔和暖調', image: 'images/products/BM-T007_main.jpg', productName: '櫻花雨', accent: '#D4A574', colorLabel: '玫瑰金、粉嫩色系' },
-        { value: 'clear_pastel', label: '清透日常', desc: '透明感高、日常通勤最安全。', scene: '通勤 / 百搭 / 透明殼', wear: '白襯衫、牛仔、淺色休閒穿搭', feel: '極簡通勤', image: 'images/products/BM-T001_main.jpg', productName: '晨光序曲', accent: '#A8D8EA', colorLabel: '透明、淺色系' },
-        { value: 'porcelain_blue', label: '霧藍瓷感', desc: '藍灰調與冷感質地，安靜耐看。', scene: '冷調 / 安靜 / 質感穿搭', wear: '灰藍、黑白、銀色配件', feel: '靜謐質感', image: 'images/products/BM-T015_main.jpg', productName: '海洋藍調', accent: '#8FB8C9', colorLabel: '藍灰色調、霧感珠串' },
-        { value: 'sage_natural', label: '自然清新', desc: '大地色與植物感，放鬆好搭配。', scene: '日常 / 旅行 / 大地色', wear: '亞麻、卡其、米白、棉麻穿搭', feel: '自然系', image: 'images/products/BM-T014_main.jpg', productName: '森林物語', accent: '#7BAE7F', colorLabel: '大地色、植物感' },
-        { value: 'midnight_luxury', label: '午夜精品', desc: '深色與金屬光澤，低調但有份量。', scene: '夜晚 / 低調 / 金屬感', wear: '黑色、深藍、金屬飾品、俐落穿搭', feel: '高級夜色', image: 'images/products/BM-T017_main.jpg', productName: '星河漫夜', accent: '#0A1628', colorLabel: '深色背景、金屬光澤' }
+        { value: 'romantic_rose', label: '浪漫復古', desc: '玫瑰金與粉色珠串，偏送禮與約會感。', scene: '送禮 / 約會 / 柔和穿搭', wear: '奶茶色、白色、針織、洋裝', feel: '柔和暖調', image: 'images/products/BM-N004_main.jpg', productName: '杏花微雨', accent: '#D4A574', colorLabel: '玫瑰金、粉嫩色系' },
+        { value: 'clear_pastel', label: '清透日常', desc: '透明感高、日常通勤最安全。', scene: '通勤 / 百搭 / 透明殼', wear: '白襯衫、牛仔、淺色休閒穿搭', feel: '極簡通勤', image: 'images/products/BM-N005_main.jpg', productName: '晨露琉璃', accent: '#A8D8EA', colorLabel: '透明、淺色系' },
+        { value: 'porcelain_blue', label: '霧藍瓷感', desc: '藍灰調與冷感質地，安靜耐看。', scene: '冷調 / 安靜 / 質感穿搭', wear: '灰藍、黑白、銀色配件', feel: '靜謐質感', image: 'images/products/BM-N011_main.jpg', productName: '霧藍水滴', accent: '#8FB8C9', colorLabel: '藍灰色調、霧感珠串' },
+        { value: 'sage_natural', label: '自然清新', desc: '大地色與植物感，放鬆好搭配。', scene: '日常 / 旅行 / 大地色', wear: '亞麻、卡其、米白、棉麻穿搭', feel: '自然系', image: 'images/products/BM-N012_main.jpg', productName: '森林綠琉璃', accent: '#7BAE7F', colorLabel: '大地色、植物感' },
+        { value: 'midnight_luxury', label: '午夜精品', desc: '深色與金屬光澤，低調但有份量。', scene: '夜晚 / 低調 / 金屬感', wear: '黑色、深藍、金屬飾品、俐落穿搭', feel: '高級夜色', image: 'images/products/BM-N008_main.jpg', productName: '曜石黑金', accent: '#0A1628', colorLabel: '深色背景、金屬光澤' }
       ],
       metal: [
         { value: 'rose_gold', label: '玫瑰金', desc: '帶一點粉感，最能接住浪漫與溫柔風格。', emoji: '◇' },
