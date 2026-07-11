@@ -1,6 +1,5 @@
-// Bo Mei Er Products — Data Loader & Renderer
-// 後台 Supabase 資料會覆蓋同 SKU 的靜態商品；靜態 products.json 作為前台保底。
-
+// Bo Mei Er Products - Data Loader & Renderer
+// Static products.json is the public storefront source of truth; Supabase can add fields, but local data wins by SKU.
 function BME_formatPrice(price) {
   if (typeof price === 'string' && price.startsWith('NT$')) return price;
   var number = Number(String(price || 0).replace(/[^0-9]/g, ''));
@@ -15,8 +14,7 @@ const BME = {
   currentSort: 'newest',
   _initPromise: null,
   _source: 'local',
-  publicStatuses: ['上架', '即將上架', '試作中'],
-  hiddenLegacySkuPrefixes: ['BM-T'],
+  publicStatuses: ['\u4e0a\u67b6', '\u5373\u5c07\u4e0a\u67b6', '\u8a66\u4f5c'],
 
   async init() {
     if (this._initPromise) return this._initPromise;
@@ -44,7 +42,7 @@ const BME = {
     this._source = supabaseProducts.length ? 'merged' : 'local';
 
     if (this.products.length === 0) {
-      this.showError('無法載入商品資料，請稍後再試。');
+      this.showError('\u76ee\u524d\u6c92\u6709\u53ef\u986f\u793a\u7684\u5546\u54c1\uff0c\u8acb\u7a0d\u5f8c\u518d\u56de\u4f86\u770b\u770b\u3002');
     }
   },
 
@@ -82,10 +80,10 @@ const BME = {
 
   mergeProductSources(localProducts, supabaseProducts) {
     var bySku = {};
-    localProducts.forEach(function(product) {
+    supabaseProducts.forEach(function(product) {
       if (product.sku) bySku[product.sku] = product;
     });
-    supabaseProducts.forEach(function(product) {
+    localProducts.forEach(function(product) {
       if (!product.sku) return;
       var base = bySku[product.sku] || {};
       bySku[product.sku] = Object.assign({}, base, product);
@@ -112,7 +110,7 @@ const BME = {
       price: BME_formatPrice(product.price),
       images: images.map(function(item) { return String(item || '').trim(); }).filter(Boolean),
       tags: tags.map(function(item) { return String(item || '').trim(); }).filter(Boolean),
-      status: product.status || '上架',
+      status: product.status || '\u4e0a\u67b6',
       style_profile: product.style_profile || '',
       description: product.description || '',
       material: product.material || '',
@@ -129,9 +127,8 @@ const BME = {
 
   isHiddenLegacyProduct(product) {
     var sku = String(product && product.sku ? product.sku : '');
-    return this.hiddenLegacySkuPrefixes.some(function(prefix) {
-      return sku.indexOf(prefix) === 0;
-    });
+    var match = sku.match(/^BM-T(\d{3})$/);
+    return !!(match && Number(match[1]) < 32);
   },
 
   resolveProductImage(path) {
@@ -166,11 +163,11 @@ const BME = {
       product.description,
       (product.tags || []).join(' ')
     ].join(' ').toLowerCase();
-    if (/耳環|earring/.test(text)) return 'earrings';
-    if (/手鍊|bracelet/.test(text)) return 'bracelet';
-    if (/項鍊|吊墜|necklace|pendant/.test(text)) return 'necklace';
-    if (/鑰匙|吊飾|keychain|charm/.test(text)) return 'keychain';
-    if (/手機|phone|strap|鏈/.test(text)) return 'phone_strap';
+    if (/earring/.test(text)) return 'earrings';
+    if (/bracelet/.test(text)) return 'bracelet';
+    if (/necklace|pendant/.test(text)) return 'necklace';
+    if (/keychain|charm/.test(text)) return 'keychain';
+    if (/phone|strap|BM-T|BM-R|BM-S|BM-N/i.test(text)) return 'phone_strap';
     return 'other';
   },
 
@@ -252,7 +249,7 @@ const BME = {
   getFilteredProducts(filter) {
     var list = this.products.slice();
     if (filter === 'new') {
-      list = list.filter(function(p) { return p.status === '上架'; });
+      list = list.filter(function(p) { return p.status === '\u4e0a\u67b6'; });
     } else if (filter && filter !== 'all') {
       list = list.filter(function(p) { return p.style_profile === filter; });
     }
@@ -309,7 +306,7 @@ const BME = {
     const filtered = this.getFilteredProducts(activeFilter);
     this.refreshResultCount(filtered.length);
     if (filtered.length === 0) {
-      container.innerHTML = '<p style="text-align:center;color:#888;padding:48px;">目前找不到符合條件的商品，可以換個風格或關鍵字。</p>';
+      container.innerHTML = '<p style="text-align:center;color:#888;padding:48px;">\u76ee\u524d\u6c92\u6709\u7b26\u5408\u689d\u4ef6\u7684\u5546\u54c1\uff0c\u53ef\u4ee5\u63db\u500b\u5206\u985e\u770b\u770b\u3002</p>';
       return;
     }
 
@@ -341,18 +338,17 @@ const BME = {
 
   createCard(product) {
     const imgSrc = product.images && product.images[0] ? this.resolveProductImage(product.images[0]) : '';
-    const heroSrc = product.images && product.images[1] ? this.resolveProductImage(product.images[1]) : '';
 
     let badge = '';
     let extraCls = '';
     let styleBadge = product.style ? '<div class="product-card-style-badge">' + this.escapeHtml(product.style) + '</div>' : '';
-    let brandMark = '<div class="product-card-brand">鉑魅兒 · 手作</div>';
+    let brandMark = '<div class="product-card-brand">\u9251\u9b45\u5152 ? \u624b\u4f5c</div>';
 
-    if (product.status === '即將上架') {
-      badge = '<div class="product-card-badge-coming">即將上架 · 開放追蹤</div>';
+    if (product.status === '\u5373\u5c07\u4e0a\u67b6') {
+      badge = '<div class="product-card-badge-coming">\u5373\u5c07\u4e0a\u67b6 ? \u958b\u653e\u8ffd\u8e64</div>';
       extraCls = ' product-card-coming';
-    } else if (product.status === '試作中') {
-      badge = '<div class="product-card-badge-trial">試作</div>';
+    } else if (product.status === '\u8a66\u4f5c') {
+      badge = '<div class="product-card-badge-trial">\u8a66\u4f5c</div>';
       extraCls = ' product-card-trial';
     }
 
@@ -362,15 +358,12 @@ const BME = {
     let imgs = '';
     if (imgSrc) {
       imgs = '<img src="' + this.escapeHtml(imgSrc) + '" alt="' + this.escapeHtml(product.product_name) + '" class="product-card-main-img" loading="lazy">';
-      if (heroSrc) {
-        imgs += '<img src="' + this.escapeHtml(heroSrc) + '" alt="' + this.escapeHtml(product.product_name) + ' - 情境" class="product-card-hero-img" loading="lazy">';
-      }
       imgs += styleBadge + brandMark;
     } else {
-      imgs = '<div class="product-card-placeholder">暫無圖片</div>';
+      imgs = '<div class="product-card-placeholder">\u66ab\u7121\u5716\u7247</div>';
     }
 
-    const linkUrl = product.status === '即將上架'
+    const linkUrl = product.status === '\u5373\u5c07\u4e0a\u67b6'
       ? 'https://www.instagram.com/bomeier/?utm_source=website&utm_medium=item&utm_campaign=' + encodeURIComponent(product.sku)
       : 'product.html?sku=' + encodeURIComponent(product.sku);
 
@@ -381,8 +374,8 @@ const BME = {
       + badge
       + '<div class="product-card-price">' + this.escapeHtml(product.price) + '</div>'
       + '<div class="product-card-actions" style="display:flex;gap:8px;margin-top:8px;">'
-      + '<button class="fav-btn fav-btn-card" data-sku="' + this.escapeHtml(product.sku) + '" aria-label="加入收藏">♡</button>'
-      + '<button class="cart-btn-card" data-sku="' + this.escapeHtml(product.sku) + '" aria-label="加入購物車">🛒</button>'
+      + '<button class="fav-btn fav-btn-card" data-sku="' + this.escapeHtml(product.sku) + '" aria-label="\u52a0\u5165\u6536\u85cf">&#9825;</button>'
+      + '<button class="cart-btn-card" data-sku="' + this.escapeHtml(product.sku) + '" aria-label="\u52a0\u5165\u8cfc\u7269\u8eca">+</button>'
       + '</div>'
       + '</div></a>';
   },
@@ -390,7 +383,7 @@ const BME = {
   renderDetail(sku) {
     const product = this.products.find(p => p.sku === sku);
     if (!product) {
-      this.showError('找不到此商品');
+      this.showError('\u627e\u4e0d\u5230\u9019\u500b\u5546\u54c1');
       return;
     }
 
@@ -403,7 +396,7 @@ const BME = {
       const firstImage = this.resolveProductImage(images[0]);
       mainImg.innerHTML = firstImage
         ? '<img src="' + this.escapeHtml(firstImage) + '" alt="' + this.escapeHtml(product.product_name) + '" id="main-product-image">'
-        : '<div class="product-card-placeholder" style="height:100%;">暫無圖片</div>';
+        : '<div class="product-card-placeholder" style="height:100%;">\u66ab\u7121\u5716\u7247</div>';
 
       var self = this;
       thumbs.innerHTML = images.map(function(img, i) {
@@ -430,7 +423,7 @@ const BME = {
     if (el('product-price')) el('product-price').textContent = product.price;
     if (el('product-status')) el('product-status').textContent = product.status;
 
-    document.title = product.product_name + ' | 鉑魅兒 Bo Mei Er';
+    document.title = product.product_name + ' | \u9251\u9b45\u5152 Bo Mei Er';
 
     var metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) metaDesc.setAttribute('content', product.description.substring(0, 150));
@@ -457,16 +450,16 @@ const BME = {
   refreshResultCount(count) {
     var node = document.getElementById('product-result-count');
     if (!node) return;
-    var suffix = this.currentSearch ? '，關鍵字「' + this.currentSearch + '」' : '';
-    node.textContent = '顯示 ' + count + ' 件商品' + suffix;
+    var suffix = this.currentSearch ? '\uff0c\u641c\u5c0b\uff1a' + this.currentSearch : '';
+    node.textContent = '\u986f\u793a ' + count + ' \u4ef6\u5546\u54c1' + suffix;
   },
 
   refreshFilterCounts() {
     var counts = this.getFilterCounts();
     var labels = {
-      'all': '全部', 'new': '新品上架', 'romantic_rose': '浪漫復古',
-      'clear_pastel': '清透日常', 'porcelain_blue': '霧藍瓷感',
-      'sage_natural': '自然清新', 'midnight_luxury': '午夜精品'
+      'all': '\u5168\u90e8', 'new': '\u65b0\u54c1\u4e0a\u67b6', 'romantic_rose': '\u6d6a\u6f2b\u5fa9\u53e4',
+      'clear_pastel': '\u6e05\u900f\u65e5\u5e38', 'porcelain_blue': '\u9727\u85cd\u74f7\u611f',
+      'sage_natural': '\u81ea\u7136\u6e05\u65b0', 'midnight_luxury': '\u5348\u591c\u7cbe\u54c1'
     };
     document.querySelectorAll('.filter-btn').forEach(function(btn) {
       var f = btn.dataset.filter;
@@ -478,7 +471,7 @@ const BME = {
 
   getFilterCounts() {
     var counts = { 'all': this.products.length };
-    counts['new'] = this.products.filter(function(p) { return p.status === '上架'; }).length;
+    counts['new'] = this.products.filter(function(p) { return p.status === '\u4e0a\u67b6'; }).length;
     var self = this;
     ['romantic_rose', 'clear_pastel', 'porcelain_blue', 'sage_natural', 'midnight_luxury'].forEach(function(s) {
       counts[s] = self.products.filter(function(p) { return p.style_profile === s; }).length;
@@ -492,10 +485,10 @@ const BME = {
     var product = this.products.find(function(p) { return p.sku === sku; });
     if (!product) return;
     var sameStyle = this.products.filter(function(p) {
-      return p.sku !== sku && p.style_profile === product.style_profile && p.status === '上架';
+      return p.sku !== sku && p.style_profile === product.style_profile && p.status === '\u4e0a\u67b6';
     });
     var related = sameStyle.length >= 3 ? sameStyle : this.products.filter(function(p) {
-      return p.sku !== sku && p.status === '上架';
+      return p.sku !== sku && p.status === '\u4e0a\u67b6';
     });
     related = related.slice(0, 4);
     if (related.length === 0) { container.style.display = 'none'; return; }

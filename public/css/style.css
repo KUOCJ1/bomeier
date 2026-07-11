@@ -1890,6 +1890,14 @@ h4 { font-size: var(--text-h4); }
   box-shadow: var(--atelier-shadow-soft);
 }
 
+.product-card .product-card-main-img {
+  opacity: 1;
+}
+
+.product-card .product-card-hero-img {
+  display: none;
+}
+
 .product-card-image {
   aspect-ratio: 4 / 5;
   background: var(--atelier-porcelain);
