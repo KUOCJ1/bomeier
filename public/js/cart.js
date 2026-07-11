@@ -69,6 +69,16 @@ var BME_CART = {
     return total;
   },
 
+  resolveImage: function(path) {
+    if (!path) return '';
+    var value = String(path).trim();
+    if (/^(https?:)?\/\//.test(value) || /^data:/.test(value) || value.indexOf('../') === 0 || value.indexOf('/') === 0) {
+      return value;
+    }
+    if (value.indexOf('images/') === 0) return value;
+    return 'images/products/' + value;
+  },
+
   injectCartUI: function() {
     // Cart icon in nav
     var navLinks = document.querySelector('.nav-links');
@@ -128,7 +138,7 @@ var BME_CART = {
     var self = this;
     container.innerHTML = this.items.map(function(item) {
       var imgHtml = item.image
-        ? '<img src="images/products/' + item.image + '" alt="' + item.product_name + '" class="cart-item-img">'
+        ? '<img src="' + self.resolveImage(item.image) + '" alt="' + item.product_name + '" class="cart-item-img">'
         : '<div class="cart-item-img-placeholder"></div>';
       return '<div class="cart-item">' +
         imgHtml +

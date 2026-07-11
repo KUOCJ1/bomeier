@@ -79,7 +79,7 @@
         <p class="section-subtitle">New Arrivals</p>
       </div>
       
-      <div class="product-grid fade-in" id="product-grid">
+      <div class="product-grid fade-in" id="product-grid" data-limit="4">
         <a class="product-card style-bg-romantic_rose" data-sku="BM-R001" href="product.html?sku=BM-R001">
           <div class="product-card-image">
             <img src="images/products/BM-R001_main.jpg" alt="蝶舞玫瑰" class="product-card-main-img" loading="lazy">
@@ -199,6 +199,7 @@
   document.addEventListener("DOMContentLoaded", async () => {
     try {
       await BME.init();
+      BME.currentSort = "newest";
       BME.renderGrid("product-grid", "new");
     } catch (e) {
       console.error("Index init failed:", e);

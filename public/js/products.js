@@ -1,16 +1,21 @@
-﻿// Bo Mei Er Products — Data Loader & Renderer
-// 資料來源：優先讀取 products.json（本地靜態），再背景更新 Supabase 資料
+// Bo Mei Er Products — Data Loader & Renderer
+// 後台 Supabase 資料會覆蓋同 SKU 的靜態商品；靜態 products.json 作為前台保底。
 
 function BME_formatPrice(price) {
   if (typeof price === 'string' && price.startsWith('NT$')) return price;
-  return 'NT$ ' + Number(price);
+  var number = Number(String(price || 0).replace(/[^0-9]/g, ''));
+  return 'NT$ ' + number.toLocaleString('zh-TW');
 }
 
 const BME = {
   products: [],
   currentFilter: 'all',
-  _supabaseUpdated: false,
+  currentSearch: '',
+  currentType: 'all',
+  currentSort: 'newest',
   _initPromise: null,
+  _source: 'local',
+  publicStatuses: ['上架', '即將上架', '試作中'],
 
   async init() {
     if (this._initPromise) return this._initPromise;
@@ -20,105 +25,173 @@ const BME = {
 
   async _doInit() {
     await this.loadProducts();
+    this.applyUrlState();
     this.setupFilters();
+    this.setupProductControls();
     this.refreshFilterCounts();
   },
 
   async loadProducts() {
-    // Step 1: Load from local products.json FIRST (no external dependency)
-    try {
-      const resp = await fetch('products.json');
-      if (resp.ok) {
-        const json = await resp.json();
-        this.products = (json.products || []).map(p => ({ ...p, price: BME_formatPrice(p.price) }));
-      }
-    } catch (e) {
-      console.warn('products.json load failed:', e);
-    }
+    const localPromise = this.fetchLocalProducts();
+    const supabasePromise = this.fetchSupabaseProducts();
+    const results = await Promise.allSettled([localPromise, supabasePromise]);
+    const localProducts = results[0].status === 'fulfilled' ? results[0].value : [];
+    const supabaseProducts = results[1].status === 'fulfilled' ? results[1].value : [];
 
-    // If local data loaded, try Supabase in background for fresher data
-    if (this.products.length > 0) {
-      this._trySupabaseInBackground();
-      return;
-    }
-
-    // Last resort — try Supabase synchronously
-    await this._trySupabaseSync();
+    this.products = this.mergeProductSources(localProducts, supabaseProducts)
+      .filter(product => this.isPublicProduct(product));
+    this._source = supabaseProducts.length ? 'merged' : 'local';
 
     if (this.products.length === 0) {
       this.showError('無法載入商品資料，請稍後再試。');
     }
   },
 
-  // Background Supabase load — doesn't block rendering
-  _trySupabaseInBackground() {
-    setTimeout(async () => {
-      try {
-        if (typeof initSupabase !== 'function') return;
-        const client = await initSupabase();
-        if (!client) return;
-        const { data, error } = await client
-          .from('products')
-          .select('*')
-          .in('status', ['上架', '即將上架', '試作中'])
-          .order('date_added', { ascending: false });
-        if (error || !data || data.length === 0) return;
-                // Only overwrite if the returned products use the same SKU set
-        var supabaseSkus = data.map(function(p) { return p.sku; });
-        var currentSkus = this.products.map(function(p) { return p.sku; });
-        var matchCount = supabaseSkus.filter(function(s) { return currentSkus.indexOf(s) >= 0; }).length;
-        // Only use Supabase data if at least half the SKUs match (prevent old data override)
-        if (matchCount >= data.length * 0.5) {
-          this.products = data.map(p => ({ ...p, price: BME_formatPrice(p.price) }));
-        } else {
-          console.warn('Supabase data mismatch - keeping local products.json data');
-          return;
-        }
-        this._supabaseUpdated = true;
-        this._reRenderCurrentView();
-      } catch (e) {
-        console.warn('Supabase background load failed (non-critical):', e);
-      }
-    }, 100);
-  },
-
-  async _trySupabaseSync() {
+  async fetchLocalProducts() {
     try {
-      if (typeof initSupabase !== 'function') return;
-      const client = await initSupabase();
-      if (!client) return;
-      const { data, error } = await client
-        .from('products')
-        .select('*')
-        .in('status', ['上架', '即將上架', '試作中'])
-        .order('date_added', { ascending: false });
-      if (!error && data && data.length > 0) {
-                // Only overwrite if the returned products use the same SKU set
-        var supabaseSkus = data.map(function(p) { return p.sku; });
-        var currentSkus = this.products.map(function(p) { return p.sku; });
-        var matchCount = supabaseSkus.filter(function(s) { return currentSkus.indexOf(s) >= 0; }).length;
-        // Only use Supabase data if at least half the SKUs match (prevent old data override)
-        if (matchCount >= data.length * 0.5) {
-          this.products = data.map(p => ({ ...p, price: BME_formatPrice(p.price) }));
-        } else {
-          console.warn('Supabase data mismatch - keeping local products.json data');
-          return;
-        }
-      }
+      const resp = await fetch('products.json', { cache: 'no-store' });
+      if (!resp.ok) return [];
+      const json = await resp.json();
+      return (json.products || []).map(p => this.normalizeProduct(p));
     } catch (e) {
-      console.warn('Supabase sync load failed:', e);
+      console.warn('products.json load failed:', e);
+      return [];
     }
   },
 
+  async fetchSupabaseProducts() {
+    try {
+      if (typeof initSupabase !== 'function') return [];
+      const client = await initSupabase();
+      if (!client) return [];
+      const { data, error } = await client
+        .from('products')
+        .select('*')
+        .order('date_added', { ascending: false });
+      if (error) {
+        console.warn('Supabase products load failed:', error.message || error);
+        return [];
+      }
+      return (data || []).map(p => this.normalizeProduct(p));
+    } catch (e) {
+      console.warn('Supabase products load failed:', e);
+      return [];
+    }
+  },
+
+  mergeProductSources(localProducts, supabaseProducts) {
+    var bySku = {};
+    localProducts.forEach(function(product) {
+      if (product.sku) bySku[product.sku] = product;
+    });
+    supabaseProducts.forEach(function(product) {
+      if (!product.sku) return;
+      var base = bySku[product.sku] || {};
+      bySku[product.sku] = Object.assign({}, base, product);
+    });
+    return Object.keys(bySku)
+      .map(function(sku) { return bySku[sku]; })
+      .sort(function(a, b) {
+        var aDate = new Date(a.date_added || a.created_at || 0).getTime();
+        var bDate = new Date(b.date_added || b.created_at || 0).getTime();
+        return bDate - aDate;
+      });
+  },
+
+  normalizeProduct(product) {
+    var images = Array.isArray(product.images)
+      ? product.images
+      : String(product.images || '').split(/[\n,]+/);
+    var tags = Array.isArray(product.tags)
+      ? product.tags
+      : String(product.tags || '').split(/[\n,]+/);
+    var normalized = Object.assign({}, product, {
+      sku: String(product.sku || '').trim(),
+      product_name: product.product_name || product.name || '',
+      price: BME_formatPrice(product.price),
+      images: images.map(function(item) { return String(item || '').trim(); }).filter(Boolean),
+      tags: tags.map(function(item) { return String(item || '').trim(); }).filter(Boolean),
+      status: product.status || '上架',
+      style_profile: product.style_profile || '',
+      description: product.description || '',
+      material: product.material || '',
+      style: product.style || '',
+      feature: product.feature || ''
+    });
+    normalized.product_type = product.product_type || this.getProductType(normalized);
+    return normalized;
+  },
+
+  isPublicProduct(product) {
+    return this.publicStatuses.indexOf(product.status) >= 0 && !product.is_sold;
+  },
+
+  resolveProductImage(path) {
+    if (!path) return '';
+    var value = String(path).trim();
+    if (/^(https?:)?\/\//.test(value) || /^data:/.test(value) || value.indexOf('../') === 0 || value.indexOf('/') === 0) {
+      return value;
+    }
+    if (value.indexOf('images/') === 0) return value;
+    return 'images/products/' + value;
+  },
+
+  escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  },
+
+  getNumericPrice(product) {
+    return parseInt(String(product.price || '').replace(/[^0-9]/g, ''), 10) || 0;
+  },
+
+  getProductType(product) {
+    var text = [
+      product.product_name,
+      product.sku,
+      product.material,
+      product.feature,
+      product.description,
+      (product.tags || []).join(' ')
+    ].join(' ').toLowerCase();
+    if (/耳環|earring/.test(text)) return 'earrings';
+    if (/手鍊|bracelet/.test(text)) return 'bracelet';
+    if (/項鍊|吊墜|necklace|pendant/.test(text)) return 'necklace';
+    if (/鑰匙|吊飾|keychain|charm/.test(text)) return 'keychain';
+    if (/手機|phone|strap|鏈/.test(text)) return 'phone_strap';
+    return 'other';
+  },
+
+  applyUrlState() {
+    var params = new URLSearchParams(window.location.search);
+    this.currentFilter = params.get('filter') || this.currentFilter || 'all';
+    this.currentSearch = params.get('q') || '';
+    this.currentType = params.get('type') || 'all';
+    this.currentSort = params.get('sort') || 'newest';
+  },
+
+  updateUrlState() {
+    if (!document.body || !document.getElementById('product-search')) return;
+    var params = new URLSearchParams(window.location.search);
+    this.currentFilter === 'all' ? params.delete('filter') : params.set('filter', this.currentFilter);
+    this.currentSearch ? params.set('q', this.currentSearch) : params.delete('q');
+    this.currentType === 'all' ? params.delete('type') : params.set('type', this.currentType);
+    this.currentSort === 'newest' ? params.delete('sort') : params.set('sort', this.currentSort);
+    var nextUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '') + window.location.hash;
+    window.history.replaceState({}, '', nextUrl);
+  },
+
   _reRenderCurrentView() {
-    // Re-render product grid if visible
     const grid = document.getElementById('product-grid');
     if (grid) {
       this.renderGrid('product-grid', this.currentFilter);
       this.refreshFilterCounts();
       return;
     }
-    // Re-render product detail if visible
     const detailSku = window.currentProductSku;
     if (detailSku) {
       this.renderDetail(detailSku);
@@ -129,46 +202,119 @@ const BME = {
   showError(msg) {
     const grid = document.querySelector('.product-grid');
     if (grid) {
-      grid.innerHTML = '<p style="text-align:center;color:#888;padding:48px;">' + msg + '</p>';
+      grid.innerHTML = '<p style="text-align:center;color:#888;padding:48px;">' + this.escapeHtml(msg) + '</p>';
     }
   },
 
   setupFilters() {
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.onclick = (e) => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    var self = this;
+    document.querySelectorAll('.filter-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.dataset.filter === self.currentFilter);
+      btn.onclick = function() {
+        document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
         btn.classList.add('active');
-        this.currentFilter = btn.dataset.filter;
-        this.renderGrid('product-grid', this.currentFilter);
+        self.currentFilter = btn.dataset.filter || 'all';
+        self.updateUrlState();
+        self.renderGrid('product-grid', self.currentFilter);
       };
     });
   },
 
+  setupProductControls() {
+    var search = document.getElementById('product-search');
+    var type = document.getElementById('product-type');
+    var sort = document.getElementById('product-sort');
+    var self = this;
+    if (search) search.value = this.currentSearch;
+    if (type) type.value = this.currentType;
+    if (sort) sort.value = this.currentSort;
+
+    var rerender = function() {
+      self.currentSearch = search ? search.value.trim() : '';
+      self.currentType = type ? type.value : 'all';
+      self.currentSort = sort ? sort.value : 'newest';
+      self.updateUrlState();
+      self.renderGrid('product-grid', self.currentFilter);
+    };
+    if (search) search.addEventListener('input', rerender);
+    if (type) type.addEventListener('change', rerender);
+    if (sort) sort.addEventListener('change', rerender);
+  },
+
   getFilteredProducts(filter) {
-    if (filter === 'all') return this.products;
-    if (filter === 'new') return this.products.filter(p => p.status === '上架');
-    return this.products.filter(p => p.style_profile === filter);
+    var list = this.products.slice();
+    if (filter === 'new') {
+      list = list.filter(function(p) { return p.status === '上架'; });
+    } else if (filter && filter !== 'all') {
+      list = list.filter(function(p) { return p.style_profile === filter; });
+    }
+
+    if (this.currentType && this.currentType !== 'all') {
+      var self = this;
+      list = list.filter(function(p) { return self.getProductType(p) === self.currentType; });
+    }
+
+    if (this.currentSearch) {
+      var keyword = this.currentSearch.toLowerCase();
+      list = list.filter(function(p) {
+        return [
+          p.product_name,
+          p.sku,
+          p.style,
+          p.style_profile,
+          p.material,
+          p.feature,
+          p.description,
+          (p.tags || []).join(' ')
+        ].join(' ').toLowerCase().indexOf(keyword) >= 0;
+      });
+    }
+
+    return this.sortProducts(list);
+  },
+
+  sortProducts(list) {
+    var self = this;
+    var sorted = list.slice();
+    if (this.currentSort === 'price_asc') {
+      sorted.sort(function(a, b) { return self.getNumericPrice(a) - self.getNumericPrice(b); });
+    } else if (this.currentSort === 'price_desc') {
+      sorted.sort(function(a, b) { return self.getNumericPrice(b) - self.getNumericPrice(a); });
+    } else if (this.currentSort === 'name_asc') {
+      sorted.sort(function(a, b) { return String(a.product_name).localeCompare(String(b.product_name), 'zh-Hant'); });
+    } else {
+      sorted.sort(function(a, b) {
+        var aDate = new Date(a.date_added || a.created_at || 0).getTime();
+        var bDate = new Date(b.date_added || b.created_at || 0).getTime();
+        return bDate - aDate;
+      });
+    }
+    return sorted;
   },
 
   renderGrid(containerId, filter) {
     const container = document.getElementById(containerId);
     if (!container) return;
+    var activeFilter = filter || this.currentFilter || 'all';
+    this.currentFilter = activeFilter;
 
-    const filtered = this.getFilteredProducts(filter);
+    const filtered = this.getFilteredProducts(activeFilter);
+    this.refreshResultCount(filtered.length);
     if (filtered.length === 0) {
-      container.innerHTML = '<p style="text-align:center;color:#888;padding:48px;">該分類目前還沒有商品，可以先看看其他款式。</p>';
+      container.innerHTML = '<p style="text-align:center;color:#888;padding:48px;">目前找不到符合條件的商品，可以換個風格或關鍵字。</p>';
       return;
     }
 
-    container.innerHTML = filtered.map(p => this.createCard(p)).join('');
+    var limit = container.dataset.limit ? parseInt(container.dataset.limit, 10) : 0;
+    var visible = limit > 0 ? filtered.slice(0, limit) : filtered;
+    container.innerHTML = visible.map(p => this.createCard(p)).join('');
 
     container.querySelectorAll('.product-card').forEach(card => {
       card.addEventListener('click', () => {
-        window.location.href = 'product.html?sku=' + card.dataset.sku;
+        window.location.href = card.getAttribute('href') || ('product.html?sku=' + card.dataset.sku);
       });
     });
 
-    // Event delegation for fav & cart buttons
     container.querySelectorAll('.fav-btn-card').forEach(function(btn) {
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -186,12 +332,12 @@ const BME = {
   },
 
   createCard(product) {
-    const imgSrc = product.images && product.images[0] ? 'images/products/' + product.images[0] : '';
-    const heroSrc = product.images && product.images[1] ? 'images/products/' + product.images[1] : '';
+    const imgSrc = product.images && product.images[0] ? this.resolveProductImage(product.images[0]) : '';
+    const heroSrc = product.images && product.images[1] ? this.resolveProductImage(product.images[1]) : '';
 
     let badge = '';
     let extraCls = '';
-    let styleBadge = product.style ? '<div class="product-card-style-badge">' + product.style + '</div>' : '';
+    let styleBadge = product.style ? '<div class="product-card-style-badge">' + this.escapeHtml(product.style) + '</div>' : '';
     let brandMark = '<div class="product-card-brand">鉑魅兒 · 手作</div>';
 
     if (product.status === '即將上架') {
@@ -207,9 +353,9 @@ const BME = {
 
     let imgs = '';
     if (imgSrc) {
-      imgs = '<img src="' + imgSrc + '" alt="' + product.product_name + '" class="product-card-main-img" loading="lazy">';
+      imgs = '<img src="' + this.escapeHtml(imgSrc) + '" alt="' + this.escapeHtml(product.product_name) + '" class="product-card-main-img" loading="lazy">';
       if (heroSrc) {
-        imgs += '<img src="' + heroSrc + '" alt="' + product.product_name + ' - 情境" class="product-card-hero-img" loading="lazy">';
+        imgs += '<img src="' + this.escapeHtml(heroSrc) + '" alt="' + this.escapeHtml(product.product_name) + ' - 情境" class="product-card-hero-img" loading="lazy">';
       }
       imgs += styleBadge + brandMark;
     } else {
@@ -217,18 +363,18 @@ const BME = {
     }
 
     const linkUrl = product.status === '即將上架'
-      ? 'https://www.instagram.com/bomeier/?utm_source=website&utm_medium=item&utm_campaign=' + product.sku
-      : 'product.html?sku=' + product.sku;
+      ? 'https://www.instagram.com/bomeier/?utm_source=website&utm_medium=item&utm_campaign=' + encodeURIComponent(product.sku)
+      : 'product.html?sku=' + encodeURIComponent(product.sku);
 
-    return '<a class="' + cardCls + '" data-sku="' + product.sku + '" data-style="' + product.style + '" href="' + linkUrl + '">'
+    return '<a class="' + cardCls + '" data-sku="' + this.escapeHtml(product.sku) + '" data-style="' + this.escapeHtml(product.style) + '" href="' + linkUrl + '">'
       + '<div class="product-card-image">' + imgs + '</div>'
       + '<div class="product-card-body">'
-      + '<div class="product-card-name">' + product.product_name + '</div>'
+      + '<div class="product-card-name">' + this.escapeHtml(product.product_name) + '</div>'
       + badge
-      + '<div class="product-card-price">' + product.price + '</div>'
+      + '<div class="product-card-price">' + this.escapeHtml(product.price) + '</div>'
       + '<div class="product-card-actions" style="display:flex;gap:8px;margin-top:8px;">'
-      + '<button class="fav-btn fav-btn-card" data-sku="' + product.sku + '" aria-label="加入收藏">♡</button>'
-      + '<button class="cart-btn-card" data-sku="' + product.sku + '" aria-label="加入購物車">🛒</button>'
+      + '<button class="fav-btn fav-btn-card" data-sku="' + this.escapeHtml(product.sku) + '" aria-label="加入收藏">♡</button>'
+      + '<button class="cart-btn-card" data-sku="' + this.escapeHtml(product.sku) + '" aria-label="加入購物車">🛒</button>'
       + '</div>'
       + '</div></a>';
   },
@@ -242,18 +388,19 @@ const BME = {
 
     window.currentProductSku = sku;
 
-    // Images
     const mainImg = document.querySelector('.product-main-image');
     const thumbs = document.querySelector('.product-thumbnails');
     if (mainImg && thumbs) {
       const images = product.images && product.images.length ? product.images : ['placeholder_01.jpg'];
-      mainImg.innerHTML = images[0]
-        ? '<img src="images/products/' + images[0] + '" alt="' + product.product_name + '" id="main-product-image">'
+      const firstImage = this.resolveProductImage(images[0]);
+      mainImg.innerHTML = firstImage
+        ? '<img src="' + this.escapeHtml(firstImage) + '" alt="' + this.escapeHtml(product.product_name) + '" id="main-product-image">'
         : '<div class="product-card-placeholder" style="height:100%;">暫無圖片</div>';
 
+      var self = this;
       thumbs.innerHTML = images.map(function(img, i) {
         return '<div class="product-thumbnail' + (i === 0 ? ' active' : '') + '" data-index="' + i + '">'
-          + '<img src="images/products/' + img + '" alt="' + product.product_name + ' - ' + (i + 1) + '">'
+          + '<img src="' + self.escapeHtml(self.resolveProductImage(img)) + '" alt="' + self.escapeHtml(product.product_name) + ' - ' + (i + 1) + '">'
           + '</div>';
       }).join('');
 
@@ -261,17 +408,17 @@ const BME = {
         thumb.addEventListener('click', function() {
           thumbs.querySelectorAll('.product-thumbnail').forEach(function(t) { t.classList.remove('active'); });
           thumb.classList.add('active');
-          mainImg.innerHTML = '<img src="images/products/' + images[thumb.dataset.index] + '" alt="' + product.product_name + '">';
+          var selected = self.resolveProductImage(images[thumb.dataset.index]);
+          mainImg.innerHTML = '<img src="' + self.escapeHtml(selected) + '" alt="' + self.escapeHtml(product.product_name) + '">';
         });
       });
     }
 
-    // Info
     var el = function(id) { return document.getElementById(id); };
     if (el('product-name')) el('product-name').textContent = product.product_name;
     if (el('product-style')) el('product-style').textContent = product.style;
     if (el('product-material')) el('product-material').textContent = product.material;
-    if (el('product-description')) el('product-description').innerHTML = product.description.replace(/\\\\n/g, '<br>').replace(/\\n/g, '<br>');
+    if (el('product-description')) el('product-description').innerHTML = this.escapeHtml(product.description).replace(/\\\\n/g, '<br>').replace(/\\n/g, '<br>');
     if (el('product-price')) el('product-price').textContent = product.price;
     if (el('product-status')) el('product-status').textContent = product.status;
 
@@ -280,27 +427,30 @@ const BME = {
     var metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) metaDesc.setAttribute('content', product.description.substring(0, 150));
 
-    // Tags
     var tagsEl = el('product-tags');
     if (tagsEl && product.tags) {
-      tagsEl.innerHTML = product.tags.map(function(t) { return '<span class="product-tag">' + t + '</span>'; }).join('');
+      tagsEl.innerHTML = product.tags.map(function(t) { return '<span class="product-tag">' + BME.escapeHtml(t) + '</span>'; }).join('');
     }
 
-    // Breadcrumb
     var bc = el('breadcrumb-product');
     if (bc) bc.textContent = product.product_name;
 
-    // CTA
     var cta = el('cta-btn');
-    if (cta) cta.href = 'https://www.instagram.com/bomeier/?utm_source=website&utm_medium=product&utm_campaign=' + sku;
+    if (cta) cta.href = 'https://www.instagram.com/bomeier/?utm_source=website&utm_medium=product&utm_campaign=' + encodeURIComponent(sku);
 
-    // Share links
     var pageUrl = encodeURIComponent(window.location.href);
     var shareText = encodeURIComponent(product.product_name);
     var lb = el('share-line');
     if (lb) lb.href = 'https://line.me/R/msg/text/?' + shareText + '%20' + pageUrl;
     var fb = el('share-fb');
     if (fb) fb.href = 'https://www.facebook.com/sharer/sharer.php?u=' + pageUrl;
+  },
+
+  refreshResultCount(count) {
+    var node = document.getElementById('product-result-count');
+    if (!node) return;
+    var suffix = this.currentSearch ? '，關鍵字「' + this.currentSearch + '」' : '';
+    node.textContent = '顯示 ' + count + ' 件商品' + suffix;
   },
 
   refreshFilterCounts() {
@@ -343,26 +493,9 @@ const BME = {
     if (related.length === 0) { container.style.display = 'none'; return; }
     container.style.display = 'block';
     container.querySelector('.related-grid').innerHTML = related.map(function(p) {
-      var img = p.images && p.images[0] ? 'images/products/' + p.images[0] : '';
-      var hero = p.images && p.images[1] ? 'images/products/' + p.images[1] : '';
-      var sb = p.style ? '<div class="product-card-style-badge">' + p.style + '</div>' : '';
-      var bm = '<div class="product-card-brand">鉌魅兒 · 手作</div>';
-      return '<a href="product.html?sku=' + p.sku + '" class="product-card'
-        + (p.style_profile ? ' style-bg-' + p.style_profile : '') + '">'
-        + '<div class="product-card-image">'
-        + (img ? '<img src="' + img + '" alt="' + p.product_name + '" class="product-card-main-img" loading="lazy">' : '')
-        + (hero ? '<img src="' + hero + '" alt="' + p.product_name + ' - 情境" class="product-card-hero-img" loading="lazy">' : '')
-        + sb + bm
-        + '</div>'
-        + '<div class="product-card-body">'
-        + '<div class="product-card-name">' + p.product_name + '</div>'
-        + '<div class="product-card-price">' + p.price + '</div>'
-        + '</div></a>';
+      return BME.createCard(p);
     }).join('');
   }
 };
 
-// Note: BME.init() is called by each page's inline script, not here
-// products.html, index.html each have their own DOMContentLoaded handler
-
-
+// Note: BME.init() is called by each page's inline script.

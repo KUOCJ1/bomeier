@@ -86,10 +86,11 @@ function renderFavoritesList() {
       return;
     }
     
-    // 載入商品資料來取得完整資訊
-    const res = await fetch('products.json');
-    const data = await res.json();
-    const allProducts = data.products;
+    // 載入商品資料來取得完整資訊，與商品頁使用同一套後台同步資料。
+    if (typeof BME !== 'undefined' && BME.init) {
+      await BME.init();
+    }
+    const allProducts = (typeof BME !== 'undefined' && BME.products) ? BME.products : [];
     
     const favoritedProducts = favs
       .map(f => allProducts.find(p => p.sku === f.sku))
@@ -121,7 +122,7 @@ function renderFavoritesList() {
       container.innerHTML = favoritedProducts.map(p => `
         <a href="product.html?sku=${p.sku}" class="product-card${p.style_profile ? ' style-bg-' + p.style_profile : ''}" data-sku="${p.sku}">
           <div class="product-card-image">
-            <img src="images/products/${p.images?.[0] || 'placeholder_01.jpg'}" alt="${p.product_name}" class="product-card-main-img" loading="lazy">
+            <img src="${typeof BME !== 'undefined' && BME.resolveProductImage ? BME.resolveProductImage(p.images?.[0] || 'placeholder_01.jpg') : 'images/products/' + (p.images?.[0] || 'placeholder_01.jpg')}" alt="${p.product_name}" class="product-card-main-img" loading="lazy">
           </div>
           <div class="product-card-body">
             <div class="product-card-name">${p.product_name}</div>
