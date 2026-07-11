@@ -16,6 +16,7 @@ const BME = {
   _initPromise: null,
   _source: 'local',
   publicStatuses: ['上架', '即將上架', '試作中'],
+  hiddenLegacySkuPrefixes: ['BM-T'],
 
   async init() {
     if (this._initPromise) return this._initPromise;
@@ -123,7 +124,14 @@ const BME = {
   },
 
   isPublicProduct(product) {
-    return this.publicStatuses.indexOf(product.status) >= 0 && !product.is_sold;
+    return this.publicStatuses.indexOf(product.status) >= 0 && !product.is_sold && !this.isHiddenLegacyProduct(product);
+  },
+
+  isHiddenLegacyProduct(product) {
+    var sku = String(product && product.sku ? product.sku : '');
+    return this.hiddenLegacySkuPrefixes.some(function(prefix) {
+      return sku.indexOf(prefix) === 0;
+    });
   },
 
   resolveProductImage(path) {
