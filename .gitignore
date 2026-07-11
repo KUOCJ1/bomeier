@@ -27,6 +27,8 @@
 !README.md
 !tsconfig.json
 !vite.config.ts
+!docs/
+!docs/**
 
 node_modules/
 dist/
