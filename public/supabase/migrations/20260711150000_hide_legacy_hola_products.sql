@@ -9,11 +9,11 @@ WHERE sku LIKE 'BM-T%';
 UPDATE public.custom_options
 SET
   image_url = CASE code
-    WHEN 'romantic_rose' THEN 'images/products/BM-N004_main.jpg'
-    WHEN 'clear_pastel' THEN 'images/products/BM-N005_main.jpg'
-    WHEN 'porcelain_blue' THEN 'images/products/BM-N011_main.jpg'
-    WHEN 'sage_natural' THEN 'images/products/BM-N012_main.jpg'
-    WHEN 'midnight_luxury' THEN 'images/products/BM-N008_main.jpg'
+    WHEN 'romantic_rose' THEN 'images/products/style-scenes/romantic-rose-ai.webp'
+    WHEN 'clear_pastel' THEN 'images/products/style-scenes/clear-pastel-ai.webp'
+    WHEN 'porcelain_blue' THEN 'images/products/style-scenes/porcelain-blue-ai.webp'
+    WHEN 'sage_natural' THEN 'images/products/style-scenes/sage-natural-ai.webp'
+    WHEN 'midnight_luxury' THEN 'images/products/style-scenes/midnight-luxury-ai.webp'
     ELSE image_url
   END,
   metadata = CASE code

@@ -61,11 +61,11 @@ CREATE POLICY "Admin full access to custom page settings"
 
 INSERT INTO public.custom_options (option_group, code, label, description, image_url, metadata, sort_order, is_active)
 VALUES
-('style', 'romantic_rose', '浪漫復古', '玫瑰金與粉色珠串，偏送禮與約會感。', 'images/products/BM-N004_main.jpg', '{"scene":"送禮 / 約會 / 柔和穿搭","wear":"奶茶色、白色、針織、洋裝","feel":"柔和暖調","productName":"杏花微雨","accent":"#D4A574","colorLabel":"玫瑰金、粉嫩色系"}'::jsonb, 10, TRUE),
-('style', 'clear_pastel', '清透日常', '透明感高、日常通勤最安全。', 'images/products/BM-N005_main.jpg', '{"scene":"通勤 / 百搭 / 透明殼","wear":"白襯衫、牛仔、淺色休閒穿搭","feel":"極簡通勤","productName":"晨露琉璃","accent":"#A8D8EA","colorLabel":"透明、淺色系"}'::jsonb, 20, TRUE),
-('style', 'porcelain_blue', '霧藍瓷感', '藍灰調與冷感質地，安靜耐看。', 'images/products/BM-N011_main.jpg', '{"scene":"冷調 / 安靜 / 質感穿搭","wear":"灰藍、黑白、銀色配件","feel":"靜謐質感","productName":"霧藍水滴","accent":"#8FB8C9","colorLabel":"藍灰色調、霧感珠串"}'::jsonb, 30, TRUE),
-('style', 'sage_natural', '自然清新', '大地色與植物感，放鬆好搭配。', 'images/products/BM-N012_main.jpg', '{"scene":"日常 / 旅行 / 大地色","wear":"亞麻、卡其、米白、棉麻穿搭","feel":"自然系","productName":"森林綠琉璃","accent":"#7BAE7F","colorLabel":"大地色、植物感"}'::jsonb, 40, TRUE),
-('style', 'midnight_luxury', '午夜精品', '深色與金屬光澤，低調但有份量。', 'images/products/BM-N008_main.jpg', '{"scene":"夜晚 / 低調 / 金屬感","wear":"黑色、深藍、金屬飾品、俐落穿搭","feel":"高級夜色","productName":"曜石黑金","accent":"#0A1628","colorLabel":"深色背景、金屬光澤"}'::jsonb, 50, TRUE),
+('style', 'romantic_rose', '浪漫復古', '玫瑰金與粉色珠串，偏送禮與約會感。', 'images/products/style-scenes/romantic-rose-ai.webp', '{"scene":"送禮 / 約會 / 柔和穿搭","wear":"奶茶色、白色、針織、洋裝","feel":"柔和暖調","productName":"杏花微雨","accent":"#D4A574","colorLabel":"玫瑰金、粉嫩色系"}'::jsonb, 10, TRUE),
+('style', 'clear_pastel', '清透日常', '透明感高、日常通勤最安全。', 'images/products/style-scenes/clear-pastel-ai.webp', '{"scene":"通勤 / 百搭 / 透明殼","wear":"白襯衫、牛仔、淺色休閒穿搭","feel":"極簡通勤","productName":"晨露琉璃","accent":"#A8D8EA","colorLabel":"透明、淺色系"}'::jsonb, 20, TRUE),
+('style', 'porcelain_blue', '霧藍瓷感', '藍灰調與冷感質地，安靜耐看。', 'images/products/style-scenes/porcelain-blue-ai.webp', '{"scene":"冷調 / 安靜 / 質感穿搭","wear":"灰藍、黑白、銀色配件","feel":"靜謐質感","productName":"霧藍水滴","accent":"#8FB8C9","colorLabel":"藍灰色調、霧感珠串"}'::jsonb, 30, TRUE),
+('style', 'sage_natural', '自然清新', '大地色與植物感，放鬆好搭配。', 'images/products/style-scenes/sage-natural-ai.webp', '{"scene":"日常 / 旅行 / 大地色","wear":"亞麻、卡其、米白、棉麻穿搭","feel":"自然系","productName":"森林綠琉璃","accent":"#7BAE7F","colorLabel":"大地色、植物感"}'::jsonb, 40, TRUE),
+('style', 'midnight_luxury', '午夜精品', '深色與金屬光澤，低調但有份量。', 'images/products/style-scenes/midnight-luxury-ai.webp', '{"scene":"夜晚 / 低調 / 金屬感","wear":"黑色、深藍、金屬飾品、俐落穿搭","feel":"高級夜色","productName":"曜石黑金","accent":"#0A1628","colorLabel":"深色背景、金屬光澤"}'::jsonb, 50, TRUE),
 ('metal', 'rose_gold', '玫瑰金', '帶一點粉感，最能接住浪漫與溫柔風格。', '', '{"emoji":"◇"}'::jsonb, 10, TRUE),
 ('metal', 'warm_gold', '暖金', '更亮一些，會把琉璃的顏色往暖調拉。', '', '{"emoji":"✦"}'::jsonb, 20, TRUE),
 ('metal', 'silver', '銀色', '乾淨、俐落，適合清透與冷調系。', '', '{"emoji":"○"}'::jsonb, 30, TRUE),
