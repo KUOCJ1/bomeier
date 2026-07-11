@@ -1799,6 +1799,191 @@ h4 { font-size: var(--text-h4); }
   }
 }
 
+/* ========================================
+   SOFT ATELIER — Storefront surfaces
+   ======================================== */
+
+.atelier-hero {
+  min-height: 92vh;
+  background: var(--atelier-paper);
+  overflow: hidden;
+}
+
+.atelier-hero .hero-bg-img {
+  opacity: 0.82;
+  filter: saturate(0.92) contrast(0.96);
+}
+
+.atelier-hero .hero-bg-img::after {
+  background:
+    linear-gradient(90deg, rgba(251,248,244,0.94) 0%, rgba(251,248,244,0.78) 38%, rgba(251,248,244,0.18) 100%),
+    linear-gradient(180deg, rgba(251,248,244,0.10) 0%, var(--atelier-paper) 100%);
+}
+
+.atelier-hero .hero-glow,
+.atelier-hero .hero-glow-2,
+.atelier-hero .hero-light-ray,
+.atelier-hero .hero-brand-mark {
+  display: none;
+}
+
+.atelier-hero .hero-content {
+  max-width: 760px;
+  margin-left: max(32px, calc((100vw - 1200px) / 2));
+  text-align: left;
+  align-items: flex-start;
+}
+
+.atelier-hero .subtitle {
+  font-family: var(--atelier-display);
+  color: var(--atelier-rose);
+  letter-spacing: 0.18em;
+}
+
+.atelier-hero h1 {
+  max-width: 660px;
+  font-family: var(--atelier-serif);
+  font-size: clamp(42px, 6vw, 76px);
+  line-height: 1.08;
+  color: var(--atelier-ink);
+}
+
+.atelier-hero .description {
+  max-width: 540px;
+  color: var(--atelier-taupe);
+  font-size: 17px;
+  line-height: 1.9;
+}
+
+.atelier-curation-copy {
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.atelier-curation-copy p {
+  margin-top: 12px;
+  color: var(--atelier-taupe);
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.atelier-section-label {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: var(--atelier-rose);
+  font-family: var(--atelier-display);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.product-card {
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--atelier-line);
+  box-shadow: none;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--atelier-shadow-soft);
+}
+
+.product-card-image {
+  aspect-ratio: 4 / 5;
+  background: var(--atelier-porcelain);
+}
+
+.product-card-image img,
+.product-card-main-img,
+.product-card-hero-img {
+  transition: transform 900ms ease, opacity 700ms ease;
+}
+
+.product-card:hover .product-card-main-img {
+  transform: scale(1.035);
+}
+
+.product-card-body {
+  padding: 14px 14px 16px;
+}
+
+.product-card-name {
+  font-family: var(--atelier-serif);
+  font-weight: 600;
+  color: var(--atelier-ink);
+}
+
+.product-card-price {
+  color: var(--atelier-taupe);
+  font-weight: 500;
+}
+
+.fav-btn-card,
+.cart-btn-card {
+  border: 1px solid var(--atelier-line);
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--atelier-ink);
+}
+
+.product-controls {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--atelier-line);
+  border-radius: 6px;
+  box-shadow: none;
+}
+
+.filter-btn {
+  border-radius: 999px;
+  background: transparent;
+}
+
+.filter-btn.active {
+  background: var(--atelier-deep);
+  border-color: var(--atelier-deep);
+}
+
+.atelier-product-detail .product-detail-inner {
+  background: rgba(255,255,255,0.58);
+  border: 1px solid var(--atelier-line);
+  border-radius: 8px;
+  padding: 28px;
+}
+
+.atelier-product-detail .product-main-image {
+  background: var(--atelier-porcelain);
+  border: 1px solid var(--atelier-line);
+  box-shadow: none;
+}
+
+.atelier-product-detail .product-info h1 {
+  font-family: var(--atelier-serif);
+  font-weight: 600;
+  color: var(--atelier-ink);
+}
+
+.atelier-product-detail .product-description {
+  color: var(--atelier-taupe);
+  line-height: 1.9;
+}
+
+@media (max-width: 760px) {
+  .atelier-hero {
+    min-height: 86vh;
+  }
+
+  .atelier-hero .hero-content {
+    margin: 0 auto;
+    padding: 0 22px;
+    text-align: left;
+  }
+
+  .atelier-product-detail .product-detail-inner {
+    padding: 16px;
+  }
+}
+
 /* --- Font rendering 強化 --- */
 body {
   text-rendering: optimizeLegibility;
