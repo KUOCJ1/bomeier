@@ -3,6 +3,526 @@
   "last_updated": "2026-07-11",
   "products": [
     {
+      "sku": "BM-N004",
+      "product_name": "杏花微雨手機鏈",
+      "material": "淡粉琉璃珠、乳白琉璃珠、銀色配件",
+      "feature": "粉白交錯，像春天的第一場細雨",
+      "style": "浪漫復古",
+      "style_profile": "romantic_rose",
+      "price": "NT$ 199",
+      "cta": "追蹤上架",
+      "status": "即將上架",
+      "description": "淡粉與乳白色的琉璃珠交錯排列，像春天細雨中的杏花——不明豔，但看著很舒服。銀色配件沒有搶走琉璃的風采，反而讓整體顏色更乾淨。\\n\\n適合穿淺色衣服的日子，或是送給喜歡溫柔色系的朋友。\\n\\n材質｜淡粉琉璃珠、乳白琉璃珠、銀色配件\\n風格｜浪漫復古",
+      "images": [
+        "BM-N004_main.jpg",
+        "BM-N004_hero.jpg",
+        "BM-N004_lifestyle_01.jpg",
+        "BM-N004_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "手機鏈",
+        "粉色",
+        "春天",
+        "溫柔",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-N005",
+      "product_name": "晨露琉璃掛飾",
+      "material": "透明琉璃珠、淺藍琉璃珠、霧銀配件",
+      "feature": "清爽通透，像清晨葉尖的露珠",
+      "style": "清透日常",
+      "style_profile": "clear_pastel",
+      "price": "NT$ 299",
+      "cta": "追蹤上架",
+      "status": "即將上架",
+      "description": "透明與淺藍的琉璃珠搭配，讓這條掛飾看起來像清晨葉尖的露珠——乾淨、清涼、不喧囂。\\n\\n尺寸偏輕巧，適合不喜歡太重掛飾的人。掛在手機上存在感不強，但低頭看到的時候會心情很好。\\n\\n材質｜透明琉璃珠、淺藍琉璃珠、霧銀配件\\n風格｜清透日常",
+      "images": [
+        "BM-N005_main.jpg",
+        "BM-N005_hero.jpg",
+        "BM-N005_lifestyle_01.jpg",
+        "BM-N005_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "掛飾",
+        "清透",
+        "藍色",
+        "輕巧",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-N006",
+      "product_name": "青瓷琉璃手機鏈",
+      "material": "霧面青瓷色琉璃、古銅配件",
+      "feature": "古典青瓷色，現代簡約線條",
+      "style": "霧藍瓷感",
+      "style_profile": "porcelain_blue",
+      "price": "NT$ 299",
+      "cta": "追蹤上架",
+      "status": "即將上架",
+      "description": "青瓷色的琉璃珠燒出來的質感很特別——不是亮面的，是那種老瓷器的霧面溫潤感。古銅配件的色澤剛好跟青瓷形成一個穩定的對比。\\n\\n這條不太挑穿著。正式一點的場合也撐得住，日常更不用說。\\n\\n材質｜霧面青瓷色琉璃珠、古銅配件\\n風格｜霧藍瓷感",
+      "images": [
+        "BM-N006_main.jpg",
+        "BM-N006_hero.jpg",
+        "BM-N006_lifestyle_01.jpg",
+        "BM-N006_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "手機鏈",
+        "青瓷",
+        "古典",
+        "氣質",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-N007",
+      "product_name": "薄荷凝霜手機鏈",
+      "material": "淺綠琉璃珠、銀色配件、透明珠",
+      "feature": "淺綠搭配透明珠，清爽春夏感",
+      "style": "自然清新",
+      "style_profile": "sage_natural",
+      "price": "NT$ 199",
+      "cta": "追蹤上架",
+      "status": "即將上架",
+      "description": "淺綠色琉璃珠配上透明珠，像一杯薄荷凝霜——視覺上先降五度。銀色配件保持整體的清爽感，不讓顏色太過濃郁。\\n\\n很適合夏天。尤其是穿白色或亞麻色的時候，這條會成為整身穿搭的亮點。\\n\\n材質｜淺綠琉璃珠、透明珠、銀色配件\\n風格｜自然清新",
+      "images": [
+        "BM-N007_main.jpg",
+        "BM-N007_hero.jpg",
+        "BM-N007_lifestyle_01.jpg",
+        "BM-N007_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "手機鏈",
+        "薄荷",
+        "春夏",
+        "清爽",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-N008",
+      "product_name": "曜石黑金手機鏈",
+      "material": "黑色琉璃珠、金色配件、金屬鍊",
+      "feature": "黑與金的經典搭配，低調但大器",
+      "style": "午夜精品",
+      "style_profile": "midnight_luxury",
+      "price": "NT$ 399",
+      "cta": "追蹤上架",
+      "status": "即將上架",
+      "description": "黑色琉璃配金色細節——最經典的配色，但也最考驗用料。黑色琉璃的光澤不能太塑膠，金色不能太刺眼。這一款的兩種材料放在一起，互相壓得住。\\n\\n送禮很安全。不確定對方喜歡什麼風格的時候，選黑色加金色幾乎不會錯。\\n\\n材質｜黑色琉璃珠、金色配件、金屬鍊\\n風格｜午夜精品",
+      "images": [
+        "BM-N008_main.jpg",
+        "BM-N008_hero.jpg",
+        "BM-N008_lifestyle_01.jpg",
+        "BM-N008_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "手機鏈",
+        "黑金",
+        "經典",
+        "中性",
+        "送禮推薦"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-N009",
+      "product_name": "琥珀光手機鏈",
+      "material": "琥珀色琉璃珠、古銅配件、木紋珠",
+      "feature": "暖調琥珀色，適合秋冬的復古感",
+      "style": "浪漫復古",
+      "style_profile": "romantic_rose",
+      "price": "NT$ 299",
+      "cta": "追蹤上架",
+      "status": "即將上架",
+      "description": "琥珀色有一種老件才有的溫暖感——光線穿過去的時候，它是透的但不是透明的，像含著一層故事。古銅配件跟木紋珠把整體的復古感拉得更飽滿。\\n\\n秋天搭卡其色外套、冬天搭黑色大衣，這條都會是那個對的細節。\\n\\n材質｜琥珀色琉璃珠、古銅配件、木紋珠\\n風格｜浪漫復古",
+      "images": [
+        "BM-N009_main.jpg",
+        "BM-N009_hero.jpg",
+        "BM-N009_lifestyle_01.jpg",
+        "BM-N009_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "手機鏈",
+        "琥珀",
+        "秋冬",
+        "復古",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-N010",
+      "product_name": "珍珠琉璃短掛飾",
+      "material": "小顆珍珠琉璃、細金屬鍊",
+      "feature": "輕巧精緻，適合多條疊戴或單獨使用",
+      "style": "清透日常",
+      "style_profile": "clear_pastel",
+      "price": "NT$ 199",
+      "cta": "追蹤上架",
+      "status": "即將上架",
+      "description": "小顆珍珠琉璃串成短掛飾，尺寸比一般手機鏈更輕巧——適合不喜歡手腕或手機上有負擔的人。\\n\\n可以單獨掛，也可以跟其他手機鏈疊戴。細金屬鍊的存在感很低，主角永遠是那幾顆珍珠琉璃。\\n\\n材質｜珍珠琉璃、細金屬鍊\\n風格｜清透日常",
+      "images": [
+        "BM-N010_main.jpg",
+        "BM-N010_hero.jpg",
+        "BM-N010_lifestyle_01.jpg",
+        "BM-N010_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "掛飾",
+        "珍珠",
+        "輕巧",
+        "疊戴",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-N011",
+      "product_name": "霧藍水滴手機鏈",
+      "material": "水滴形霧藍琉璃、銀色配件",
+      "feature": "水滴造型少見，簡約中有設計感",
+      "style": "霧藍瓷感",
+      "style_profile": "porcelain_blue",
+      "price": "NT$ 299",
+      "cta": "追蹤上架",
+      "status": "即將上架",
+      "description": "水滴形的霧藍琉璃是這批裡面最有造型感的一款。它不是圓珠，是一滴凝結的藍——從某個角度看是透明的，轉一個角度又變回霧藍。\\n\\n銀色配件保持簡潔，讓視覺焦點完全留在琉璃的型與色上。\\n\\n材質｜水滴形霧藍琉璃、銀色配件\\n風格｜霧藍瓷感",
+      "images": [
+        "BM-N011_main.jpg",
+        "BM-N011_hero.jpg",
+        "BM-N011_lifestyle_01.jpg",
+        "BM-N011_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "手機鏈",
+        "水滴",
+        "霧藍",
+        "設計感",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-N012",
+      "product_name": "森林綠琉璃掛飾",
+      "material": "深綠琉璃珠、原木色配件、麻繩編織",
+      "feature": "自然系配色，森林與泥土的色調",
+      "style": "自然清新",
+      "style_profile": "sage_natural",
+      "price": "NT$ 299",
+      "cta": "追蹤上架",
+      "status": "即將上架",
+      "description": "深綠色琉璃珠配上原木色配件與麻繩編織元素——這條掛飾的色調像走進森林：樹葉的綠、樹幹的棕、泥土的暖。\\n\\n它不精緻到有距離感，反而有一種手作的樸實溫度。適合喜歡自然風格、不愛太都會感的人。\\n\\n材質｜深綠琉璃珠、原木色配件、麻繩\\n風格｜自然清新",
+      "images": [
+        "BM-N012_main.jpg",
+        "BM-N012_hero.jpg",
+        "BM-N012_lifestyle_01.jpg",
+        "BM-N012_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "掛飾",
+        "森林",
+        "自然",
+        "手作",
+        "大地色"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-N013",
+      "product_name": "月光石手機鏈",
+      "material": "乳白透光琉璃、霧銀配件",
+      "feature": "柔和乳白光澤，像月光一樣安靜",
+      "style": "清透日常",
+      "style_profile": "clear_pastel",
+      "price": "NT$ 299",
+      "cta": "追蹤上架",
+      "status": "即將上架",
+      "description": "乳白色的琉璃珠在光線下會透出一層像月光一樣的柔和光暈——不是閃耀，是一種很安靜的亮。霧銀配件把這種安靜感維持得很好，沒有多餘的裝飾。\\n\\n如果你喜歡那種「不說話也有氣場」的風格，這條就是你的。\\n\\n材質｜乳白透光琉璃、霧銀配件\\n風格｜清透日常",
+      "images": [
+        "BM-N013_main.jpg",
+        "BM-N013_hero.jpg",
+        "BM-N013_lifestyle_01.jpg",
+        "BM-N013_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "手機鏈",
+        "月光",
+        "乳白",
+        "安靜",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-N014",
+      "product_name": "復古紅琉璃手機鏈",
+      "material": "暗紅色琉璃珠、古銅配件",
+      "feature": "沉穩的暗紅色，成熟有韻味",
+      "style": "浪漫復古",
+      "style_profile": "romantic_rose",
+      "price": "NT$ 299",
+      "cta": "追蹤上架",
+      "status": "即將上架",
+      "description": "暗紅色琉璃珠不是那種亮眼的正紅，而是帶一點沉、帶一點褐的復古紅。古銅配件跟它是老搭檔，兩種暖色放在一起很有年代感——像是從阿嬤的珠寶盒裡翻出來的那種好看。\\n\\n適合搭配深色手機殼，或是秋冬的駝色、黑色穿搭。\\n\\n材質｜暗紅色琉璃珠、古銅配件\\n風格｜浪漫復古",
+      "images": [
+        "BM-N014_main.jpg",
+        "BM-N014_hero.jpg",
+        "BM-N014_lifestyle_01.jpg",
+        "BM-N014_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "手機鏈",
+        "復古紅",
+        "沉穩",
+        "秋冬",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-N015",
+      "product_name": "冰川藍手機鏈",
+      "material": "冰裂紋琉璃珠、銀色配件",
+      "feature": "冰裂紋質感，清冷而獨特",
+      "style": "霧藍瓷感",
+      "style_profile": "porcelain_blue",
+      "price": "NT$ 199",
+      "cta": "追蹤上架",
+      "status": "即將上架",
+      "description": "這批琉璃珠燒出來之後帶有自然形成的冰裂紋——不是瑕疵，是燒製過程中溫度變化留下的痕跡，每一顆的裂紋走向都不一樣。\\n\\n冰藍色配上銀色配件，整體感覺清冷但有溫度。是那種「一看就知道不是量產貨」的款式。\\n\\n材質｜冰裂紋琉璃珠、銀色配件\\n風格｜霧藍瓷感",
+      "images": [
+        "BM-N015_main.jpg",
+        "BM-N015_hero.jpg",
+        "BM-N015_lifestyle_01.jpg",
+        "BM-N015_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "手機鏈",
+        "冰川",
+        "冰裂紋",
+        "獨特",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-N016",
+      "product_name": "薰衣草紫掛飾",
+      "material": "淡紫琉璃珠、霧銀配件",
+      "feature": "柔和紫調，浪漫但不甜膩",
+      "style": "浪漫復古",
+      "style_profile": "romantic_rose",
+      "price": "NT$ 199",
+      "cta": "追蹤上架",
+      "status": "即將上架",
+      "description": "淡紫色的琉璃珠很容易做得太可愛——但這款的紫選得剛好，不是粉紫，是偏冷一點的薰衣草紫。霧銀配件不搶色，讓紫色自己說話。\\n\\n適合喜歡紫色但怕太少女的人。掛在白色或淺灰色手機殼上最好看。\\n\\n材質｜淡紫琉璃珠、霧銀配件\\n風格｜浪漫復古",
+      "images": [
+        "BM-N016_main.jpg",
+        "BM-N016_hero.jpg",
+        "BM-N016_lifestyle_01.jpg",
+        "BM-N016_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "掛飾",
+        "薰衣草",
+        "紫色",
+        "浪漫",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-N017",
+      "product_name": "橄欖綠手機鏈",
+      "material": "橄欖綠琉璃珠、古銅配件",
+      "feature": "軍綠與古銅的復古戶外感",
+      "style": "自然清新",
+      "style_profile": "sage_natural",
+      "price": "NT$ 199",
+      "cta": "追蹤上架",
+      "status": "即將上架",
+      "description": "橄欖綠配古銅——這組配色靈感來自老式戶外裝備與軍裝細節。琉璃珠的綠色不鮮豔，是那種在野外待久了才會出現的沉穩色澤。\\n\\n這條的風格比較中性，男生女生都適合。搭配深色手機殼或皮革手機套特別對味。\\n\\n材質｜橄欖綠琉璃珠、古銅配件\\n風格｜自然清新",
+      "images": [
+        "BM-N017_main.jpg",
+        "BM-N017_hero.jpg",
+        "BM-N017_lifestyle_01.jpg",
+        "BM-N017_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "手機鏈",
+        "橄欖綠",
+        "中性",
+        "戶外",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-N018",
+      "product_name": "星河琉璃手機鏈",
+      "material": "深色琉璃珠（含細碎亮片）、金屬配件",
+      "feature": "深色珠子中的細碎亮點，像夜空",
+      "style": "午夜精品",
+      "style_profile": "midnight_luxury",
+      "price": "NT$ 399",
+      "cta": "追蹤上架",
+      "status": "即將上架",
+      "description": "這批深色琉璃珠燒製的時候摻入了極細碎的金屬亮片——不是那種廉價亮粉效果，是像夜空中遠遠的星光，若有若無的閃爍。\\n\\n光線下低調發亮，暗處則回歸沉穩深色。一條手機鏈有兩種表情。\\n\\n材質｜深色琉璃珠（含亮片）、金屬配件\\n風格｜午夜精品",
+      "images": [
+        "BM-N018_main.jpg",
+        "BM-N018_hero.jpg",
+        "BM-N018_lifestyle_01.jpg",
+        "BM-N018_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "手機鏈",
+        "星河",
+        "亮片",
+        "夜空",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-N019",
+      "product_name": "奶茶色手機鏈",
+      "material": "暖調奶茶色琉璃珠、金色配件",
+      "feature": "百搭奶茶色，任何手機殼都合適",
+      "style": "清透日常",
+      "style_profile": "clear_pastel",
+      "price": "NT$ 199",
+      "cta": "追蹤上架",
+      "status": "即將上架",
+      "description": "奶茶色琉璃珠是那種第一眼看不出特別，但用久了你會發現它跟什麼都搭的顏色——淺色手機殼很和諧，深色手機殼有對比，連透明殼都好看。\\n\\n金色配件點綴了一點精緻感，但整體還是乾淨耐看的路線。如果你想找一條每天都不會想換下來的，就是它。\\n\\n材質｜奶茶色琉璃珠、金色配件\\n風格｜清透日常",
+      "images": [
+        "BM-N019_main.jpg",
+        "BM-N019_hero.jpg",
+        "BM-N019_lifestyle_01.jpg",
+        "BM-N019_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "手機鏈",
+        "奶茶色",
+        "百搭",
+        "日常",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-R001",
+      "product_name": "玫瑰蝶影手機鏈",
+      "material": "琉璃珠、透明花瓣吊飾、玫瑰圖紋珠、金色配件",
+      "feature": "玫瑰與蝴蝶交錯的復古甜感，金色配件撐出精緻度",
+      "style": "浪漫復古",
+      "style_profile": "romantic_rose",
+      "price": "NT$ 299",
+      "cta": "私訊購買",
+      "status": "上架",
+      "description": "光線穿過透明花瓣的時候，細碎的光影會落在手機殼上——不是那種張揚的閃，是低調到只有你會發現的那種。\\n\\n玫瑰圖紋珠與金色配件交錯，讓這條手機鏈在復古與現代之間剛好到位。適合搭配淺色手機殼、亞麻襯衫、或是任何你想要一點低調甜感的日子。\\n\\n材質｜琉璃珠、透明花瓣吊飾、玫瑰圖紋珠、金色配件\\n風格｜浪漫復古\\n注意｜花瓣吊飾為手工配件，請避免大力拉扯",
+      "images": [
+        "BM-R001_main.jpg",
+        "BM-R001_hero.jpg",
+        "BM-R001_lifestyle_01.jpg",
+        "BM-R001_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "手機鏈",
+        "玫瑰",
+        "復古",
+        "手作琉璃",
+        "浪漫"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-S001",
+      "product_name": "暮光琉璃手機鏈",
+      "material": "手作琉璃珠、霧面金屬配件",
+      "feature": "黃昏光線下透出暖光，低調但有層次",
+      "style": "低調精緻",
+      "style_profile": "clear_pastel",
+      "price": "NT$ 199",
+      "cta": "私訊購買",
+      "status": "上架",
+      "description": "這批琉璃珠在午後陽光下會出現一層淡淡的暖光——不是設計師刻意做的，是琉璃這種材料自己的脾氣。\\n\\n金屬配件選了霧面質感，剛好壓住琉璃的透，整體看起來就是剛剛好。不張揚、不無聊，適合每天用。\\n\\n材質｜手作琉璃珠、霧面金屬配件\\n風格｜低調精緻\\n注意｜琉璃珠避免與硬物碰撞",
+      "images": [
+        "BM-S001_main.jpg",
+        "BM-S001_hero.jpg",
+        "BM-S001_lifestyle_01.jpg",
+        "BM-S001_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "手機鏈",
+        "琉璃",
+        "低調",
+        "日常",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-S002",
+      "product_name": "玫瑰金琉璃掛飾",
+      "material": "琉璃珠、玫瑰金色金屬配件",
+      "feature": "輕奢玫瑰金，手機包包都適合",
+      "style": "輕奢日常",
+      "style_profile": "romantic_rose",
+      "price": "NT$ 299",
+      "cta": "私訊購買",
+      "status": "上架",
+      "description": "玫瑰金是一個很微妙的顏色——太亮就俗，太暗就沉。這款的玫瑰金色配件是我們挑了好幾批才定下來的。\\n\\n配上透光琉璃珠，剛好是那種「有注意到就會多看一眼」的存在。掛在手機上或包包上都好看。\\n\\n材質｜琉璃珠、玫瑰金色金屬配件\\n風格｜輕奢日常",
+      "images": [
+        "BM-S002_main.jpg",
+        "BM-S002_hero.jpg",
+        "BM-S002_lifestyle_01.jpg",
+        "BM-S002_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "掛飾",
+        "玫瑰金",
+        "輕奢",
+        "包包配件",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
+      "sku": "BM-S003",
+      "product_name": "午夜藍琉璃手機鏈",
+      "material": "深色琉璃珠、金屬鍊",
+      "feature": "室內沉穩、陽光下透出礦物藍光",
+      "style": "個性優雅",
+      "style_profile": "midnight_luxury",
+      "price": "NT$ 399",
+      "cta": "私訊購買",
+      "status": "上架",
+      "description": "午夜藍在室內看是接近黑色的深藍，但走到陽光下——那些深色琉璃珠會透出一層礦物般的藍色光澤。\\n\\n這條適合不喜歡太甜、不喜歡太引人注目、但對細節有要求的人。金屬鍊的觸感很順，掛在手機上不會刮殼。\\n\\n材質｜深色琉璃珠、金屬鍊\\n風格｜個性優雅",
+      "images": [
+        "BM-S003_main.jpg",
+        "BM-S003_hero.jpg",
+        "BM-S003_lifestyle_01.jpg",
+        "BM-S003_lifestyle_02.jpg"
+      ],
+      "tags": [
+        "手機鏈",
+        "深藍",
+        "個性",
+        "中性",
+        "手作琉璃"
+      ],
+      "date_added": "2026-07-05"
+    },
+    {
       "sku": "BM-T001",
       "product_name": "晨光琉璃手機鏈",
       "material": "手作琉璃珠、透光花瓣、金屬配件",
