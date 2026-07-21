@@ -57,9 +57,9 @@
         <div class="product-description" id="product-description">載入中…</div>
         <button class="fav-btn fav-btn-detail" data-sku="" id="fav-btn" onclick="BME_toggleFavorite(this.dataset.sku)" aria-label="加入收藏">♡ 加入收藏</button>
         <div class="product-cta-section">
-          <a href="#" class="btn btn-primary" id="cta-btn">私訊詢問</a>
+          <a href="#" class="btn btn-primary" id="cta-btn">私訊詢問庫存</a>
           <button class="btn btn-secondary" onclick="history.back()">回上頁</button>
-          <button class="btn btn-primary" id="add-to-cart-btn" onclick="BME_addToCart(window.currentProductSku)" style="margin-top:8px;">🛒 加入購物車</button>
+          <button class="btn btn-primary" id="add-to-cart-btn" onclick="BME_addToCart(window.currentProductSku)" style="margin-top:8px;">加入購物車</button>
         </div>
         <div class="product-tags" id="product-tags"></div>
       </div>
@@ -109,6 +109,17 @@
 
   </section>
 </main>
+
+<div class="mobile-product-sticky" aria-label="商品快速操作">
+  <div class="mobile-product-summary">
+    <span id="mobile-sticky-name">商品詳情</span>
+    <strong id="mobile-sticky-price">私訊詢價</strong>
+  </div>
+  <div class="mobile-product-actions">
+    <button type="button" id="mobile-add-to-cart-btn" onclick="BME_addToCart(this.dataset.sku || window.currentProductSku)">加入</button>
+    <a href="#" id="mobile-cta-btn" target="_blank" rel="noopener">私訊</a>
+  </div>
+</div>
 
 <div class="product-zoom-modal" id="product-zoom-modal" aria-hidden="true">
   <button class="product-zoom-close" type="button" id="product-zoom-close" aria-label="關閉放大圖片">×</button>

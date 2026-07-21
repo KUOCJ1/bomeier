@@ -342,10 +342,10 @@ const BME = {
     let badge = '';
     let extraCls = '';
     let styleBadge = product.style ? '<div class="product-card-style-badge">' + this.escapeHtml(product.style) + '</div>' : '';
-    let brandMark = '<div class="product-card-brand">\u9251\u9b45\u5152 ? \u624b\u4f5c</div>';
+    let brandMark = '<div class="product-card-brand">鉑魅兒 · 手作</div>';
 
     if (product.status === '\u5373\u5c07\u4e0a\u67b6') {
-      badge = '<div class="product-card-badge-coming">\u5373\u5c07\u4e0a\u67b6 ? \u958b\u653e\u8ffd\u8e64</div>';
+      badge = '<div class="product-card-badge-coming">即將上架 · 開放追蹤</div>';
       extraCls = ' product-card-coming';
     } else if (product.status === '\u8a66\u4f5c') {
       badge = '<div class="product-card-badge-trial">\u8a66\u4f5c</div>';
@@ -373,9 +373,9 @@ const BME = {
       + '<div class="product-card-name">' + this.escapeHtml(product.product_name) + '</div>'
       + badge
       + '<div class="product-card-price">' + this.escapeHtml(product.price) + '</div>'
-      + '<div class="product-card-actions" style="display:flex;gap:8px;margin-top:8px;">'
+      + '<div class="product-card-actions">'
       + '<button class="fav-btn fav-btn-card" data-sku="' + this.escapeHtml(product.sku) + '" aria-label="\u52a0\u5165\u6536\u85cf">&#9825;</button>'
-      + '<button class="cart-btn-card" data-sku="' + this.escapeHtml(product.sku) + '" aria-label="\u52a0\u5165\u8cfc\u7269\u8eca">+</button>'
+      + '<button class="cart-btn-card" data-sku="' + this.escapeHtml(product.sku) + '" aria-label="加入購物車"><span>加入購物車</span></button>'
       + '</div>'
       + '</div></a>';
   },
@@ -440,6 +440,14 @@ const BME = {
 
     var cta = el('cta-btn');
     if (cta) cta.href = 'https://www.instagram.com/bomeier/?utm_source=website&utm_medium=product&utm_campaign=' + encodeURIComponent(sku);
+    var mobileCta = el('mobile-cta-btn');
+    if (mobileCta) mobileCta.href = 'https://www.instagram.com/bomeier/?utm_source=website&utm_medium=mobile_sticky&utm_campaign=' + encodeURIComponent(sku);
+    var mobileCart = el('mobile-add-to-cart-btn');
+    if (mobileCart) mobileCart.dataset.sku = sku;
+    var mobileName = el('mobile-sticky-name');
+    if (mobileName) mobileName.textContent = product.product_name;
+    var mobilePrice = el('mobile-sticky-price');
+    if (mobilePrice) mobilePrice.textContent = product.price;
 
     var pageUrl = encodeURIComponent(window.location.href);
     var shareText = encodeURIComponent(product.product_name);
