@@ -30,7 +30,7 @@ SET search_path = public
 AS $$
   SELECT
     public.current_profile_role() IN ('owner', 'admin')
-    OR lower(COALESCE(auth.jwt() ->> 'email', '')) IN ('kuocj1@gmail.com');
+    OR lower(COALESCE(auth.jwt() ->> 'email', '')) IN ('kuocj1@gmail.com', 'bomei.cheng1116@gmail.com');
 $$;
 
 CREATE OR REPLACE FUNCTION public.can_manage_orders()
@@ -42,7 +42,7 @@ SET search_path = public
 AS $$
   SELECT
     public.current_profile_role() IN ('owner', 'admin', 'fulfillment')
-    OR lower(COALESCE(auth.jwt() ->> 'email', '')) IN ('kuocj1@gmail.com');
+    OR lower(COALESCE(auth.jwt() ->> 'email', '')) IN ('kuocj1@gmail.com', 'bomei.cheng1116@gmail.com');
 $$;
 
 CREATE OR REPLACE FUNCTION public.can_manage_content()
@@ -54,7 +54,7 @@ SET search_path = public
 AS $$
   SELECT
     public.current_profile_role() IN ('owner', 'admin', 'editor')
-    OR lower(COALESCE(auth.jwt() ->> 'email', '')) IN ('kuocj1@gmail.com');
+    OR lower(COALESCE(auth.jwt() ->> 'email', '')) IN ('kuocj1@gmail.com', 'bomei.cheng1116@gmail.com');
 $$;
 
 -- Profiles: users can still manage their own profile; admin actors can review and assign roles.
