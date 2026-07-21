@@ -3,9 +3,32 @@
 
 var BME_ADMIN = {
   adminEmail: null,
+  adminRole: null,
   productEditorId: null,
   postEditorId: null,
   adminEmailAllowlist: ['kuocj1@gmail.com'],
+  roleLabels: {
+    owner: '擁有者',
+    admin: '管理員',
+    fulfillment: '訂單處理',
+    editor: '內容編輯',
+    user: '一般會員'
+  },
+  pagePermissions: {
+    orders: 'orders:read',
+    custom: 'orders:read',
+    'custom-options': 'content:write',
+    products: 'content:write',
+    posts: 'content:write',
+    permissions: 'permissions:write'
+  },
+  rolePermissions: {
+    owner: ['orders:read', 'orders:write', 'content:write', 'permissions:write'],
+    admin: ['orders:read', 'orders:write', 'content:write'],
+    fulfillment: ['orders:read', 'orders:write'],
+    editor: ['content:write'],
+    user: []
+  },
   storageBucket: 'product-images',
   customOptionGroups: {
     style: '風格情境',
@@ -24,17 +47,20 @@ var BME_ADMIN = {
 
       initSupabase().then(function(client) {
         client.from('profiles').select('role').eq('id', user.id).single().then(function(res) {
-          var isAdmin = !!(res && res.data && res.data.role === 'admin');
+          var role = (res && res.data && res.data.role) ? res.data.role : 'user';
           var isAllowlisted = user && user.email && BME_ADMIN.adminEmailAllowlist.indexOf(user.email.toLowerCase()) >= 0;
-          if (isAdmin || isAllowlisted) {
+          if (isAllowlisted) role = 'owner';
+          if (BME_ADMIN.isAdminRole(role)) {
             self.adminEmail = user.email;
+            self.adminRole = role;
             var loading = document.getElementById('admin-loading');
             var content = document.getElementById('admin-content');
             var email = document.getElementById('admin-email');
             if (loading) loading.style.display = 'none';
             if (content) content.style.display = 'block';
-            if (email) email.textContent = user.email;
-            self.loadPage(self.getPage());
+            if (email) email.textContent = user.email + ' · ' + self.getRoleLabel(role);
+            self.applyNavigationPermissions();
+            self.loadPage(self.getAllowedPage(self.getPage()));
           } else {
             var fail = document.getElementById('admin-loading');
             if (fail) {
@@ -54,6 +80,7 @@ var BME_ADMIN = {
   },
 
   loadPage: function(page) {
+    page = this.getAllowedPage(page);
     var navBtns = document.querySelectorAll('.admin-nav-btn');
     navBtns.forEach(function(btn) { btn.classList.remove('active'); });
     var active = document.querySelector('.admin-nav-btn[data-page="' + page + '"]');
@@ -64,6 +91,47 @@ var BME_ADMIN = {
     else if (page === 'custom-options') this.renderCustomOptions();
     else if (page === 'products') this.renderProducts();
     else if (page === 'posts') this.renderPosts();
+    else if (page === 'permissions') this.renderPermissions();
+  },
+
+  isAdminRole: function(role) {
+    return ['owner', 'admin', 'fulfillment', 'editor'].indexOf(role) >= 0;
+  },
+
+  getRoleLabel: function(role) {
+    return this.roleLabels[role] || role || '未設定';
+  },
+
+  hasPermission: function(permission) {
+    var permissions = this.rolePermissions[this.adminRole] || [];
+    return permissions.indexOf(permission) >= 0;
+  },
+
+  requirePermission: function(permission, message) {
+    if (this.hasPermission(permission)) return true;
+    alert(message || '你的角色沒有執行這個操作的權限。');
+    return false;
+  },
+
+  getAllowedPage: function(page) {
+    var target = page || 'orders';
+    var needed = this.pagePermissions[target];
+    if (!needed || this.hasPermission(needed)) return target;
+    var fallback = ['orders', 'custom', 'products', 'posts', 'custom-options', 'permissions'].find(function(candidate) {
+      var perm = BME_ADMIN.pagePermissions[candidate];
+      return perm && BME_ADMIN.hasPermission(perm);
+    });
+    return fallback || 'orders';
+  },
+
+  applyNavigationPermissions: function() {
+    document.querySelectorAll('.admin-nav-btn').forEach(function(btn) {
+      var page = btn.dataset.page;
+      var permission = BME_ADMIN.pagePermissions[page];
+      var allowed = !permission || BME_ADMIN.hasPermission(permission);
+      btn.style.display = allowed ? '' : 'none';
+      btn.disabled = !allowed;
+    });
   },
 
   escapeHtml: function(value) {
@@ -171,6 +239,7 @@ var BME_ADMIN = {
   },
 
   uploadProductImages: function(fileInputId, textareaId, previewId) {
+    if (!this.requirePermission('content:write')) return;
     var input = document.getElementById(fileInputId);
     var files = input && input.files ? Array.prototype.slice.call(input.files) : [];
     if (files.length === 0) {
@@ -222,6 +291,7 @@ var BME_ADMIN = {
   },
 
   renderOrders: function() {
+    if (!this.requirePermission('orders:read')) return;
     var container = document.getElementById('admin-panel-content');
     if (!container) return;
     container.innerHTML = '<div class="skeleton-loading" style="padding:40px;text-align:center;">載入訂單…</div>';
@@ -275,6 +345,7 @@ var BME_ADMIN = {
   },
 
   renderCustomOrders: function() {
+    if (!this.requirePermission('orders:read')) return;
     var container = document.getElementById('admin-panel-content');
     if (!container) return;
     container.innerHTML = '<div class="skeleton-loading" style="padding:40px;text-align:center;">載入客製化訂單…</div>';
@@ -338,6 +409,7 @@ var BME_ADMIN = {
   },
 
   renderProducts: function() {
+    if (!this.requirePermission('content:write')) return;
     var container = document.getElementById('admin-panel-content');
     if (!container) return;
     container.innerHTML = '<div class="skeleton-loading" style="padding:40px;text-align:center;">載入商品…</div>';
@@ -432,6 +504,7 @@ var BME_ADMIN = {
   },
 
   renderPosts: function() {
+    if (!this.requirePermission('content:write')) return;
     var container = document.getElementById('admin-panel-content');
     if (!container) return;
     container.innerHTML = '<div class="skeleton-loading" style="padding:40px;text-align:center;">載入網誌文章…</div>';
@@ -526,6 +599,7 @@ var BME_ADMIN = {
   },
 
   showProductForm: function(productId) {
+    if (!this.requirePermission('content:write')) return;
     var container = document.getElementById('admin-panel-content');
     var self = this;
     this.productEditorId = productId || null;
@@ -600,6 +674,7 @@ var BME_ADMIN = {
   },
 
   saveProduct: function() {
+    if (!this.requirePermission('content:write')) return;
     var productId = document.getElementById('product-id').value.trim();
     var priceValue = document.getElementById('product-price').value;
     var payload = {
@@ -656,6 +731,7 @@ var BME_ADMIN = {
   },
 
   deleteProduct: function(productId, title) {
+    if (!this.requirePermission('content:write')) return;
     if (!confirm('確認刪除商品「' + title + '」？')) return;
     initSupabase().then(function(client) {
       client.from('products').delete().eq('id', productId).then(function(res) {
@@ -669,6 +745,7 @@ var BME_ADMIN = {
   },
 
   showPostForm: function(postId) {
+    if (!this.requirePermission('content:write')) return;
     var container = document.getElementById('admin-panel-content');
     this.postEditorId = postId || null;
     var isEdit = !!postId;
@@ -729,6 +806,7 @@ var BME_ADMIN = {
   },
 
   savePost: function() {
+    if (!this.requirePermission('content:write')) return;
     var postId = document.getElementById('post-id').value.trim();
     var title = document.getElementById('post-title').value.trim();
     var payload = {
@@ -781,6 +859,7 @@ var BME_ADMIN = {
   },
 
   deletePost: function(postId, title) {
+    if (!this.requirePermission('content:write')) return;
     if (!confirm('確認刪除文章「' + title + '」？')) return;
     initSupabase().then(function(client) {
       client.from('journal_posts').delete().eq('id', postId).then(function(res) {
@@ -798,6 +877,7 @@ var BME_ADMIN = {
   },
 
   renderCustomOptions: function() {
+    if (!this.requirePermission('content:write')) return;
     var container = document.getElementById('admin-panel-content');
     if (!container) return;
     container.innerHTML = '<div class="skeleton-loading" style="padding:40px;text-align:center;">載入客製選項…</div>';
@@ -908,6 +988,7 @@ var BME_ADMIN = {
   },
 
   showCustomOptionForm: function(optionId) {
+    if (!this.requirePermission('content:write')) return;
     var container = document.getElementById('admin-panel-content');
     var isEdit = !!optionId;
     initSupabase().then(function(client) {
@@ -975,6 +1056,7 @@ var BME_ADMIN = {
   },
 
   saveCustomOption: function() {
+    if (!this.requirePermission('content:write')) return;
     var optionId = document.getElementById('custom-option-id').value.trim();
     var code = document.getElementById('custom-option-code').value.trim();
     var label = document.getElementById('custom-option-label').value.trim();
@@ -1030,6 +1112,7 @@ var BME_ADMIN = {
   },
 
   saveCustomPageSettings: function() {
+    if (!this.requirePermission('content:write')) return;
     var value = {
       heroTitle: document.getElementById('custom-setting-hero-title').value.trim(),
       heroSubtitle: document.getElementById('custom-setting-hero-subtitle').value.trim(),
@@ -1060,6 +1143,7 @@ var BME_ADMIN = {
   },
 
   toggleCustomOptionActive: function(optionId, active) {
+    if (!this.requirePermission('content:write')) return;
     initSupabase().then(function(client) {
       client.from('custom_options').update({ is_active: active, updated_at: new Date().toISOString() }).eq('id', optionId).then(function(res) {
         if (res && res.error) {
@@ -1071,7 +1155,99 @@ var BME_ADMIN = {
     });
   },
 
+  renderPermissions: function() {
+    if (!this.requirePermission('permissions:write')) return;
+    var container = document.getElementById('admin-panel-content');
+    if (!container) return;
+    container.innerHTML = '<div class="skeleton-loading" style="padding:40px;text-align:center;">載入權限資料…</div>';
+
+    initSupabase().then(function(client) {
+      client.from('profiles')
+        .select('id,nickname,role,created_at,updated_at')
+        .order('created_at', { ascending: false })
+        .then(function(res) {
+          if (res && res.error) {
+            container.innerHTML = '<div class="empty-state"><p>權限資料讀取失敗：' + BME_ADMIN.escapeHtml(res.error.message) + '</p></div>';
+            return;
+          }
+
+          var profiles = res.data || [];
+          var counts = profiles.reduce(function(acc, profile) {
+            var role = profile.role || 'user';
+            acc[role] = (acc[role] || 0) + 1;
+            return acc;
+          }, {});
+
+          var html = '<div class="admin-toolbar"><div><h2 style="margin:0;font-size:18px;color:#0A1628;">權限設定</h2><p style="margin:4px 0 0;color:#777;font-size:13px;">管理後台角色。真正限制仍以 Supabase RLS 為準。</p></div></div>';
+          html += BME_ADMIN.renderStatCards([
+            { label: '擁有者', value: counts.owner || 0 },
+            { label: '管理員', value: counts.admin || 0 },
+            { label: '訂單處理', value: counts.fulfillment || 0 },
+            { label: '內容編輯', value: counts.editor || 0 }
+          ]);
+          html += '<div class="admin-permission-note">' +
+            '<strong>角色說明</strong>' +
+            '<span>擁有者：可管理權限與全站內容。</span>' +
+            '<span>管理員：可管理訂單、商品、文章、客製選項。</span>' +
+            '<span>訂單處理：只看與更新一般/客製訂單。</span>' +
+            '<span>內容編輯：只管理商品、文章與客製選項。</span>' +
+          '</div>';
+
+          if (profiles.length === 0) {
+            html += '<div class="empty-state"><p>目前沒有會員資料。</p></div>';
+          } else {
+            html += '<div style="overflow-x:auto;"><table class="admin-table"><thead><tr><th>暱稱</th><th>User ID</th><th>目前角色</th><th>建立日期</th><th>操作</th></tr></thead><tbody>';
+            html += profiles.map(function(profile) {
+              var role = profile.role || 'user';
+              return '<tr>' +
+                '<td>' + BME_ADMIN.escapeHtml(profile.nickname || '未命名會員') + '</td>' +
+                '<td style="font-family:monospace;font-size:12px;">' + BME_ADMIN.escapeHtml(profile.id || '—') + '</td>' +
+                '<td><span class="admin-role-pill role-' + BME_ADMIN.escapeHtml(role) + '">' + BME_ADMIN.escapeHtml(BME_ADMIN.getRoleLabel(role)) + '</span></td>' +
+                '<td>' + BME_ADMIN.formatShortDate(profile.created_at) + '</td>' +
+                '<td><select class="admin-status-select" data-profile-id="' + BME_ADMIN.escapeHtml(profile.id) + '" onchange="BME_ADMIN.updateUserRole(this)">' +
+                  ['user', 'editor', 'fulfillment', 'admin', 'owner'].map(function(roleOption) {
+                    return '<option value="' + roleOption + '"' + (role === roleOption ? ' selected' : '') + '>' + BME_ADMIN.escapeHtml(BME_ADMIN.getRoleLabel(roleOption)) + '</option>';
+                  }).join('') +
+                '</select></td>' +
+              '</tr>';
+            }).join('');
+            html += '</tbody></table></div>';
+          }
+
+          container.innerHTML = html;
+        });
+    });
+  },
+
+  updateUserRole: function(select) {
+    if (!this.requirePermission('permissions:write')) return;
+    var profileId = select.dataset.profileId;
+    var role = select.value;
+    if (!profileId) {
+      alert('找不到會員 ID');
+      return;
+    }
+    if (['user', 'editor', 'fulfillment', 'admin', 'owner'].indexOf(role) < 0) {
+      alert('角色不合法');
+      return;
+    }
+    initSupabase().then(function(client) {
+      client.from('profiles')
+        .update({ role: role, updated_at: new Date().toISOString() })
+        .eq('id', profileId)
+        .then(function(res) {
+          if (res && res.error) {
+            alert('權限更新失敗：' + res.error.message);
+            BME_ADMIN.renderPermissions();
+            return;
+          }
+          BME_ADMIN.renderPermissions();
+        });
+    });
+  },
+
   updateOrderStatus: function(select) {
+    if (!this.requirePermission('orders:write')) return;
     var orderId = select.dataset.orderId;
     var status = select.value;
     initSupabase().then(function(client) {
@@ -1086,6 +1262,7 @@ var BME_ADMIN = {
   },
 
   updateCustomStatus: function(select) {
+    if (!this.requirePermission('orders:write')) return;
     var orderId = select.dataset.orderId;
     var status = select.value;
     initSupabase().then(function(client) {
@@ -1100,6 +1277,7 @@ var BME_ADMIN = {
   },
 
   toggleSold: function(productId, checked) {
+    if (!this.requirePermission('content:write')) return;
     initSupabase().then(function(client) {
       var updates = { is_sold: checked, updated_at: new Date().toISOString() };
       if (checked) updates.status = '已售出';

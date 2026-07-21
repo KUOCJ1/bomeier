@@ -87,9 +87,20 @@ var BME_CART = {
       cartIcon.id = 'cart-icon';
       cartIcon.href = '#';
       cartIcon.setAttribute('onclick', 'BME_CART.togglePanel();return false;');
-      cartIcon.style.cssText = 'position:relative;font-size:18px;';
-      cartIcon.innerHTML = '🛒 <span id="cart-badge" class="cart-badge" style="display:none;">0</span>';
+      cartIcon.className = 'cart-nav-link';
+      cartIcon.innerHTML = '<span aria-hidden="true">購物車</span><span id="cart-badge" class="cart-badge" style="display:none;">0</span>';
       navLinks.appendChild(cartIcon);
+    }
+
+    if (!document.getElementById('mobile-cart-fab')) {
+      var fab = document.createElement('button');
+      fab.id = 'mobile-cart-fab';
+      fab.className = 'mobile-cart-fab';
+      fab.type = 'button';
+      fab.setAttribute('onclick', 'BME_CART.togglePanel();return false;');
+      fab.setAttribute('aria-label', '打開購物車');
+      fab.innerHTML = '<span>購物車</span><strong id="mobile-cart-count">0</strong>';
+      document.body.appendChild(fab);
     }
 
     // Cart sidebar panel
@@ -107,8 +118,8 @@ var BME_CART = {
           '<div id="cart-panel-items" class="cart-panel-items"></div>' +
           '<div class="cart-panel-footer">' +
             '<div id="cart-panel-total" class="cart-panel-total"></div>' +
-            '<button class="btn btn-primary" onclick="BME_CART.checkout()" style="width:100%;">前往結帳</button>' +
-            '<p style="font-size:11px;color:#999;margin-top:8px;text-align:center;">結帳後將導向 IG 私訊確認訂單</p>' +
+            '<button class="btn btn-primary cart-checkout-btn" onclick="BME_CART.checkout()">傳送 IG 詢價單</button>' +
+            '<p class="cart-checkout-note">不會直接扣款。送出後會開啟 Instagram，由鉑魅兒確認庫存與付款方式。</p>' +
           '</div>' +
         '</div>';
       document.body.appendChild(panel);
@@ -163,21 +174,37 @@ var BME_CART = {
 
   renderBadge: function() {
     var badge = document.getElementById('cart-badge');
-    if (!badge) return;
     var count = this.getCount();
-    badge.textContent = count;
-    badge.style.display = count > 0 ? 'inline' : 'none';
+    if (badge) {
+      badge.textContent = count;
+      badge.style.display = count > 0 ? 'inline' : 'none';
+    }
+    var mobileCount = document.getElementById('mobile-cart-count');
+    if (mobileCount) mobileCount.textContent = count;
+    var fab = document.getElementById('mobile-cart-fab');
+    if (fab) fab.classList.toggle('has-items', count > 0);
   },
 
   checkout: function() {
     // 初期透過 IG 私訊購買
+    if (!this.items.length) {
+      this.showNotification('購物車目前是空的');
+      return;
+    }
     var total = this.getTotal();
-    var itemsStr = this.items.map(function(i) { return i.product_name + ' x' + i.quantity; }).join('%0A');
-    var msg = '嗨鉑魅兒，我想購買以下商品：%0A%0A' +
-      itemsStr + '%0A%0A' +
-      '合計：NT$ ' + total.toLocaleString() + '%0A%0A' +
-      '請協助確認庫存與總金額，謝謝！';
-    window.open('https://www.instagram.com/bomeier/?utm_source=website&utm_medium=cart&utm_campaign=checkout&text=' + msg, '_blank');
+    var itemsStr = this.items.map(function(i) {
+      return '- ' + i.product_name + '（' + i.sku + '）x ' + i.quantity;
+    }).join('\n');
+    var msg = [
+      '嗨鉑魅兒，我想詢問以下商品是否可購買：',
+      '',
+      itemsStr,
+      '',
+      '網站試算合計：NT$ ' + total.toLocaleString(),
+      '',
+      '請協助確認庫存、運費與付款方式，謝謝。'
+    ].join('\n');
+    window.open('https://www.instagram.com/bomeier/?utm_source=website&utm_medium=cart&utm_campaign=checkout&text=' + encodeURIComponent(msg), '_blank');
   },
 
   displayPrice: function(price) {

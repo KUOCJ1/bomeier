@@ -199,6 +199,68 @@
   white-space: nowrap;
 }
 
+.admin-permission-note {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid #E7E0DA;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(10,22,40,0.04);
+}
+
+.admin-permission-note strong {
+  grid-column: 1 / -1;
+  color: #0A1628;
+  font-size: 13px;
+}
+
+.admin-permission-note span {
+  color: #555;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.admin-role-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid #E7E0DA;
+  background: #F8F3EE;
+  color: #555;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.admin-role-pill.role-owner {
+  border-color: #0A1628;
+  background: #0A1628;
+  color: #fff;
+}
+
+.admin-role-pill.role-admin {
+  border-color: rgba(201,149,107,0.35);
+  background: rgba(201,149,107,0.12);
+  color: #8A5A34;
+}
+
+.admin-role-pill.role-fulfillment {
+  border-color: rgba(123,174,127,0.35);
+  background: rgba(123,174,127,0.12);
+  color: #3F7A45;
+}
+
+.admin-role-pill.role-editor {
+  border-color: rgba(143,184,201,0.38);
+  background: rgba(143,184,201,0.14);
+  color: #3F6D7E;
+}
+
 .admin-status-select {
   padding: 4px 8px;
   border: 1px solid #E7E0DA;
@@ -488,6 +550,10 @@ textarea.admin-input {
 
   .admin-image-preview {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-permission-note {
+    grid-template-columns: 1fr;
   }
 
   .admin-upload-row {
