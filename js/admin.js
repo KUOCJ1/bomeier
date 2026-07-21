@@ -6,7 +6,7 @@ var BME_ADMIN = {
   adminRole: null,
   productEditorId: null,
   postEditorId: null,
-  adminEmailAllowlist: ['kuocj1@gmail.com'],
+  adminEmailAllowlist: ['kuocj1@gmail.com', 'bomei.cheng1116@gmail.com'],
   roleLabels: {
     owner: '擁有者',
     admin: '管理員',
