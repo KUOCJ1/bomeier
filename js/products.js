@@ -244,6 +244,24 @@ const BME = {
     if (search) search.addEventListener('input', rerender);
     if (type) type.addEventListener('change', rerender);
     if (sort) sort.addEventListener('change', rerender);
+
+    var reset = document.getElementById('product-reset');
+    if (reset) {
+      reset.addEventListener('click', function() {
+        self.currentFilter = 'all';
+        self.currentSearch = '';
+        self.currentType = 'all';
+        self.currentSort = 'newest';
+        if (search) search.value = '';
+        if (type) type.value = 'all';
+        if (sort) sort.value = 'newest';
+        document.querySelectorAll('.filter-btn').forEach(function(btn) {
+          btn.classList.toggle('active', btn.dataset.filter === 'all');
+        });
+        self.updateUrlState();
+        self.renderGrid('product-grid', 'all');
+      });
+    }
   },
 
   getFilteredProducts(filter) {
@@ -439,7 +457,17 @@ const BME = {
     if (bc) bc.textContent = product.product_name;
 
     var cta = el('cta-btn');
-    if (cta) cta.href = 'https://www.instagram.com/bomeier/?utm_source=website&utm_medium=product&utm_campaign=' + encodeURIComponent(sku);
+    if (cta) {
+      cta.href = 'https://www.instagram.com/bomeier/?utm_source=website&utm_medium=product&utm_campaign=' + encodeURIComponent(sku);
+      cta.addEventListener('click', function() {
+        var msg = '嗨鉑魅兒，我想詢問「' + product.product_name + '」（' + sku + '）是否還有現貨。';
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(msg).catch(function() {});
+        }
+      }, { once: true });
+    }
+    var fav = el('fav-btn');
+    if (fav) fav.dataset.sku = sku;
     var mobileCta = el('mobile-cta-btn');
     if (mobileCta) mobileCta.href = 'https://www.instagram.com/bomeier/?utm_source=website&utm_medium=mobile_sticky&utm_campaign=' + encodeURIComponent(sku);
     var mobileCart = el('mobile-add-to-cart-btn');

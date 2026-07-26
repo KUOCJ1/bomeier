@@ -4,6 +4,7 @@
 var BME_ADMIN = {
   adminEmail: null,
   adminRole: null,
+  adminUserId: null,
   productEditorId: null,
   postEditorId: null,
   adminEmailAllowlist: ['kuocj1@gmail.com', 'bomei.cheng1116@gmail.com'],
@@ -53,6 +54,7 @@ var BME_ADMIN = {
           if (BME_ADMIN.isAdminRole(role)) {
             self.adminEmail = user.email;
             self.adminRole = role;
+            self.adminUserId = user.id;
             var loading = document.getElementById('admin-loading');
             var content = document.getElementById('admin-content');
             var email = document.getElementById('admin-email');
@@ -177,6 +179,31 @@ var BME_ADMIN = {
     container.innerHTML = '<div class="empty-state"><p>' + this.escapeHtml(message) + '</p></div>';
   },
 
+  renderPanelError: function(container, title, message) {
+    container.innerHTML = '<section class="admin-state-panel admin-state-panel-error">' +
+      '<strong>' + this.escapeHtml(title) + '</strong>' +
+      '<p>' + this.escapeHtml(message || '請稍後再試，或確認 Supabase 權限設定。') + '</p>' +
+      '<button class="btn btn-secondary" onclick="BME_ADMIN.loadPage(BME_ADMIN.getPage())">重新載入</button>' +
+    '</section>';
+  },
+
+  renderEmptyPanel: function(container, title, message, actionHtml) {
+    container.innerHTML = '<section class="admin-state-panel">' +
+      '<strong>' + this.escapeHtml(title) + '</strong>' +
+      '<p>' + this.escapeHtml(message || '') + '</p>' +
+      (actionHtml || '') +
+    '</section>';
+  },
+
+  renderAdminHint: function(items) {
+    return '<div class="admin-ops-hints">' + items.map(function(item) {
+      return '<div class="admin-ops-hint">' +
+        '<strong>' + BME_ADMIN.escapeHtml(item.title) + '</strong>' +
+        '<span>' + BME_ADMIN.escapeHtml(item.body) + '</span>' +
+      '</div>';
+    }).join('') + '</div>';
+  },
+
   renderStatCards: function(cards) {
     return '<div class="admin-stats">' + cards.map(function(card) {
       return '<div class="admin-stat-card">' +
@@ -298,9 +325,13 @@ var BME_ADMIN = {
 
     initSupabase().then(function(client) {
       client.from('orders').select('*').order('created_at', { ascending: false }).then(function(res) {
+        if (res && res.error) {
+          BME_ADMIN.renderPanelError(container, '訂單讀取失敗', res.error.message);
+          return;
+        }
         var orders = res.data || [];
         if (orders.length === 0) {
-          BME_ADMIN.renderEmpty(container, '還沒有訂單記錄');
+          BME_ADMIN.renderEmptyPanel(container, '還沒有訂單記錄', '前台目前以 IG 私訊詢價為主；若未建立資料表或 RLS 未開放，這裡也會是空的。', '<a class="btn btn-secondary" href="../products.html" target="_blank">查看前台商品</a>');
           return;
         }
 
@@ -311,6 +342,11 @@ var BME_ADMIN = {
         var revenue = orders.reduce(function(sum, o) { return sum + (parseInt(o.amount, 10) || 0); }, 0);
 
         var html = '<div class="admin-toolbar"><div><h2 style="margin:0;font-size:18px;color:#0A1628;">訂單管理</h2><p style="margin:4px 0 0;color:#777;font-size:13px;">追蹤一般商品訂單狀態。</p></div></div>';
+        html += BME_ADMIN.renderAdminHint([
+          { title: '待確認優先', body: '先處理待確認訂單，避免 IG 對話與後台狀態不同步。' },
+          { title: '失敗會回復列表', body: '狀態更新若被 RLS 擋下，系統會顯示錯誤並重新載入。' },
+          { title: '累計金額', body: '此數字依訂單 amount 欄位加總，不代表已收款金額。' }
+        ]);
         html += BME_ADMIN.renderStatCards([
           { label: '訂單總數', value: orders.length },
           { label: '待確認', value: pendingCount },
@@ -340,7 +376,11 @@ var BME_ADMIN = {
 
         html += '</tbody></table></div>';
         container.innerHTML = html;
+      }).catch(function(err) {
+        BME_ADMIN.renderPanelError(container, '訂單讀取失敗', (err && err.message) ? err.message : '請稍後再試');
       });
+    }).catch(function(err) {
+      BME_ADMIN.renderPanelError(container, '後台連線失敗', (err && err.message) ? err.message : '請確認 Supabase 設定');
     });
   },
 
@@ -359,9 +399,13 @@ var BME_ADMIN = {
 
     initSupabase().then(function(client) {
       client.from('custom_orders').select('*').order('created_at', { ascending: false }).then(function(res) {
+        if (res && res.error) {
+          BME_ADMIN.renderPanelError(container, '客製訂單讀取失敗', res.error.message);
+          return;
+        }
         var orders = res.data || [];
         if (orders.length === 0) {
-          BME_ADMIN.renderEmpty(container, '還沒有客製化訂單');
+          BME_ADMIN.renderEmptyPanel(container, '還沒有客製化訂單', '客製需求會依資料表與 RLS 回傳結果顯示；前台客製頁仍可作為主要詢問入口。', '<a class="btn btn-secondary" href="../custom.html" target="_blank">查看客製頁</a>');
           return;
         }
 
@@ -370,6 +414,11 @@ var BME_ADMIN = {
         var productionCount = orders.filter(function(o) { return o.status === 'in_production'; }).length;
         var completedCount = orders.filter(function(o) { return o.status === 'completed'; }).length;
         var html = '<div class="admin-toolbar"><div><h2 style="margin:0;font-size:18px;color:#0A1628;">客製化訂單</h2><p style="margin:4px 0 0;color:#777;font-size:13px;">追蹤客戶風格、材質與參考圖需求。</p></div></div>';
+        html += BME_ADMIN.renderAdminHint([
+          { title: '討論中要留痕', body: '客製需求若轉到 IG 溝通，狀態仍建議同步到後台。' },
+          { title: '參考圖先確認', body: '製作前檢查圖片連結是否可開啟，避免漏掉客戶指定元素。' },
+          { title: '完成後封存', body: '已完成與已取消分開標示，方便後續統計客製轉換。' }
+        ]);
         html += BME_ADMIN.renderStatCards([
           { label: '客製總數', value: orders.length },
           { label: '待處理', value: pendingCount },
@@ -404,7 +453,11 @@ var BME_ADMIN = {
 
         html += '</tbody></table></div>';
         container.innerHTML = html;
+      }).catch(function(err) {
+        BME_ADMIN.renderPanelError(container, '客製訂單讀取失敗', (err && err.message) ? err.message : '請稍後再試');
       });
+    }).catch(function(err) {
+      BME_ADMIN.renderPanelError(container, '後台連線失敗', (err && err.message) ? err.message : '請確認 Supabase 設定');
     });
   },
 
@@ -1199,12 +1252,13 @@ var BME_ADMIN = {
             html += '<div style="overflow-x:auto;"><table class="admin-table"><thead><tr><th>暱稱</th><th>User ID</th><th>目前角色</th><th>建立日期</th><th>操作</th></tr></thead><tbody>';
             html += profiles.map(function(profile) {
               var role = profile.role || 'user';
+              var isCurrentUser = profile.id === BME_ADMIN.adminUserId;
               return '<tr>' +
-                '<td>' + BME_ADMIN.escapeHtml(profile.nickname || '未命名會員') + '</td>' +
+                '<td>' + BME_ADMIN.escapeHtml(profile.nickname || '未命名會員') + (isCurrentUser ? '<span class="admin-self-badge">目前登入</span>' : '') + '</td>' +
                 '<td style="font-family:monospace;font-size:12px;">' + BME_ADMIN.escapeHtml(profile.id || '—') + '</td>' +
                 '<td><span class="admin-role-pill role-' + BME_ADMIN.escapeHtml(role) + '">' + BME_ADMIN.escapeHtml(BME_ADMIN.getRoleLabel(role)) + '</span></td>' +
                 '<td>' + BME_ADMIN.formatShortDate(profile.created_at) + '</td>' +
-                '<td><select class="admin-status-select" data-profile-id="' + BME_ADMIN.escapeHtml(profile.id) + '" onchange="BME_ADMIN.updateUserRole(this)">' +
+                '<td><select class="admin-status-select" data-profile-id="' + BME_ADMIN.escapeHtml(profile.id) + '" onchange="BME_ADMIN.updateUserRole(this)"' + (isCurrentUser ? ' disabled title="不能在此變更目前登入帳號角色"' : '') + '>' +
                   ['user', 'editor', 'fulfillment', 'admin', 'owner'].map(function(roleOption) {
                     return '<option value="' + roleOption + '"' + (role === roleOption ? ' selected' : '') + '>' + BME_ADMIN.escapeHtml(BME_ADMIN.getRoleLabel(roleOption)) + '</option>';
                   }).join('') +
@@ -1215,7 +1269,11 @@ var BME_ADMIN = {
           }
 
           container.innerHTML = html;
+        }).catch(function(err) {
+          BME_ADMIN.renderPanelError(container, '權限資料讀取失敗', (err && err.message) ? err.message : '請稍後再試');
         });
+    }).catch(function(err) {
+      BME_ADMIN.renderPanelError(container, '後台連線失敗', (err && err.message) ? err.message : '請確認 Supabase 設定');
     });
   },
 
@@ -1225,6 +1283,11 @@ var BME_ADMIN = {
     var role = select.value;
     if (!profileId) {
       alert('找不到會員 ID');
+      return;
+    }
+    if (profileId === this.adminUserId) {
+      alert('為避免把自己鎖在後台外，請使用另一個擁有者帳號調整目前登入帳號的角色。');
+      this.renderPermissions();
       return;
     }
     if (['user', 'editor', 'fulfillment', 'admin', 'owner'].indexOf(role) < 0) {
@@ -1242,7 +1305,13 @@ var BME_ADMIN = {
             return;
           }
           BME_ADMIN.renderPermissions();
+        }).catch(function(err) {
+          alert('權限更新失敗：' + ((err && err.message) ? err.message : '請稍後再試'));
+          BME_ADMIN.renderPermissions();
         });
+    }).catch(function(err) {
+      alert('後台連線失敗：' + ((err && err.message) ? err.message : '請確認 Supabase 設定'));
+      BME_ADMIN.renderPermissions();
     });
   },
 
@@ -1253,11 +1322,18 @@ var BME_ADMIN = {
     initSupabase().then(function(client) {
       client.from('orders').update({ status: status, updated_at: new Date().toISOString() }).eq('id', orderId).then(function(res) {
         if (res && res.error) {
-          alert('更新失敗');
+          alert('訂單狀態更新失敗：' + res.error.message);
+          BME_ADMIN.renderOrders();
           return;
         }
         BME_ADMIN.renderOrders();
+      }).catch(function(err) {
+        alert('訂單狀態更新失敗：' + ((err && err.message) ? err.message : '請稍後再試'));
+        BME_ADMIN.renderOrders();
       });
+    }).catch(function(err) {
+      alert('後台連線失敗：' + ((err && err.message) ? err.message : '請確認 Supabase 設定'));
+      BME_ADMIN.renderOrders();
     });
   },
 
@@ -1268,11 +1344,18 @@ var BME_ADMIN = {
     initSupabase().then(function(client) {
       client.from('custom_orders').update({ status: status, updated_at: new Date().toISOString() }).eq('id', orderId).then(function(res) {
         if (res && res.error) {
-          alert('更新失敗');
+          alert('客製訂單狀態更新失敗：' + res.error.message);
+          BME_ADMIN.renderCustomOrders();
           return;
         }
         BME_ADMIN.renderCustomOrders();
+      }).catch(function(err) {
+        alert('客製訂單狀態更新失敗：' + ((err && err.message) ? err.message : '請稍後再試'));
+        BME_ADMIN.renderCustomOrders();
       });
+    }).catch(function(err) {
+      alert('後台連線失敗：' + ((err && err.message) ? err.message : '請確認 Supabase 設定'));
+      BME_ADMIN.renderCustomOrders();
     });
   },
 
@@ -1283,11 +1366,18 @@ var BME_ADMIN = {
       if (checked) updates.status = '已售出';
       client.from('products').update(updates).eq('id', productId).then(function(res) {
         if (res && res.error) {
-          alert('更新失敗');
+          alert('商品狀態更新失敗：' + res.error.message);
+          BME_ADMIN.renderProducts();
           return;
         }
         BME_ADMIN.renderProducts();
+      }).catch(function(err) {
+        alert('商品狀態更新失敗：' + ((err && err.message) ? err.message : '請稍後再試'));
+        BME_ADMIN.renderProducts();
       });
+    }).catch(function(err) {
+      alert('後台連線失敗：' + ((err && err.message) ? err.message : '請確認 Supabase 設定'));
+      BME_ADMIN.renderProducts();
     });
   }
 };
