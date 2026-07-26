@@ -79,6 +79,15 @@ var BME_CART = {
     return 'images/products/' + value;
   },
 
+  escapeHtml: function(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  },
+
   injectCartUI: function() {
     // Cart icon in nav
     var navLinks = document.querySelector('.nav-links');
@@ -149,20 +158,20 @@ var BME_CART = {
     var self = this;
     container.innerHTML = this.items.map(function(item) {
       var imgHtml = item.image
-        ? '<img src="' + self.resolveImage(item.image) + '" alt="' + item.product_name + '" class="cart-item-img">'
+        ? '<img src="' + self.escapeHtml(self.resolveImage(item.image)) + '" alt="' + self.escapeHtml(item.product_name) + '" class="cart-item-img">'
         : '<div class="cart-item-img-placeholder"></div>';
       return '<div class="cart-item">' +
         imgHtml +
         '<div class="cart-item-info">' +
-          '<div class="cart-item-name">' + item.product_name + '</div>' +
-          '<div class="cart-item-price">' + self.displayPrice(item.price) + '</div>' +
+          '<div class="cart-item-name">' + self.escapeHtml(item.product_name) + '</div>' +
+          '<div class="cart-item-price">' + self.escapeHtml(self.displayPrice(item.price)) + '</div>' +
           '<div class="cart-item-qty">' +
-            '<button onclick="BME_CART.updateQuantity(\'' + item.sku + '\',' + (item.quantity - 1) + ')" ' + (item.quantity <= 1 ? 'disabled' : '') + '>&minus;</button>' +
+            '<button onclick="BME_CART.updateQuantity(\'' + self.escapeHtml(item.sku) + '\',' + (item.quantity - 1) + ')" ' + (item.quantity <= 1 ? 'disabled' : '') + '>&minus;</button>' +
             '<span>' + item.quantity + '</span>' +
-            '<button onclick="BME_CART.updateQuantity(\'' + item.sku + '\',' + (item.quantity + 1) + ')">+</button>' +
+            '<button onclick="BME_CART.updateQuantity(\'' + self.escapeHtml(item.sku) + '\',' + (item.quantity + 1) + ')">+</button>' +
           '</div>' +
         '</div>' +
-        '<button class="cart-item-remove" onclick="BME_CART.remove(\'' + item.sku + '\')">&times;</button>' +
+        '<button class="cart-item-remove" onclick="BME_CART.remove(\'' + self.escapeHtml(item.sku) + '\')">&times;</button>' +
       '</div>';
     }).join('');
 
@@ -204,7 +213,28 @@ var BME_CART = {
       '',
       '請協助確認庫存、運費與付款方式，謝謝。'
     ].join('\n');
-    window.open('https://www.instagram.com/bomeier/?utm_source=website&utm_medium=cart&utm_campaign=checkout&text=' + encodeURIComponent(msg), '_blank');
+    var self = this;
+    var targetUrl = 'https://www.instagram.com/bomeier/?utm_source=website&utm_medium=cart&utm_campaign=checkout';
+    var igWindow = window.open('', '_blank');
+    var openIg = function() {
+      if (igWindow) {
+        igWindow.location.href = targetUrl;
+      } else {
+        window.location.href = targetUrl;
+      }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(msg).then(function() {
+        self.showNotification('詢價單已複製，請貼到 IG 私訊');
+        openIg();
+      }).catch(function() {
+        self.showNotification('已開啟 IG，請手動貼上購物車商品');
+        openIg();
+      });
+    } else {
+      self.showNotification('已開啟 IG，請手動貼上購物車商品');
+      openIg();
+    }
   },
 
   displayPrice: function(price) {

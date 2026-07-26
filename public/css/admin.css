@@ -271,6 +271,89 @@
   cursor: pointer;
 }
 
+.admin-status-select:disabled {
+  background: #F4EEE7;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.admin-ops-hints {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-ops-hint {
+  min-height: 82px;
+  padding: 14px;
+  border: 1px solid #E7E0DA;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(10,22,40,0.04);
+}
+
+.admin-ops-hint strong {
+  display: block;
+  color: #0A1628;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.admin-ops-hint span {
+  display: block;
+  color: #666;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.admin-state-panel {
+  max-width: 680px;
+  margin: 30px auto;
+  padding: 28px;
+  border: 1px solid #E7E0DA;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(10,22,40,0.06);
+  text-align: center;
+}
+
+.admin-state-panel strong {
+  display: block;
+  color: #0A1628;
+  font-size: 17px;
+  margin-bottom: 8px;
+}
+
+.admin-state-panel p {
+  margin: 0 0 18px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.admin-state-panel-error {
+  border-color: rgba(201,123,107,0.4);
+}
+
+.admin-state-panel-error strong {
+  color: #A34E40;
+}
+
+.admin-self-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(10,22,40,0.08);
+  color: #0A1628;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 /* ── Product Admin Form ── */
 .admin-form {
   background: #fff;
@@ -538,6 +621,10 @@ textarea.admin-input {
 
   .admin-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-ops-hints {
+    grid-template-columns: 1fr;
   }
 
   .admin-controls {
