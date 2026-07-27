@@ -161,9 +161,10 @@ var BME_ADMIN = {
 
   imageSrc: function(path, folder) {
     if (!path) return '';
-    if (/^https?:\/\//.test(path) || /^data:/.test(path) || /^\/\//.test(path) || path.indexOf('../') === 0 || path.indexOf('images/') === 0 || path.indexOf('/') === 0) {
+    if (/^https?:\/\//.test(path) || /^data:/.test(path) || /^\/\//.test(path) || path.indexOf('../') === 0 || path.indexOf('/') === 0) {
       return path;
     }
+    if (path.indexOf('images/') === 0) return '../' + path;
     return (folder || '../images/products/') + path;
   },
 
